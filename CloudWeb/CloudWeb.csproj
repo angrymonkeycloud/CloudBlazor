@@ -25,6 +25,10 @@
 	</ItemGroup>
 
 	<ItemGroup>
+	  <ProjectReference Include="..\CloudBlazor\CloudBlazor.csproj" />
+	</ItemGroup>
+
+	<ItemGroup>
 		<None Update="amc-logo.png" Pack="True" PackagePath="\" />
 	</ItemGroup>
 

@@ -3,27 +3,23 @@
     disableEnhancedNavigation
 } from "./scripts/cloud-blazor.js";
 
-export function beforeStart() {
+function initialize() {
     disableEnhancedNavigation();
     initializeCloudBlazor();
+}
+
+export function beforeStart() {
+    initialize();
 }
 
 export function afterStarted() {
-    disableEnhancedNavigation();
-    initializeCloudBlazor();
+    initialize();
 }
 
 export function beforeWebStart() {
-    disableEnhancedNavigation();
-    initializeCloudBlazor();
+    initialize();
 }
 
-export function afterWebStarted(blazor) {
-    disableEnhancedNavigation();
-    initializeCloudBlazor();
-
-    blazor?.addEventListener?.("enhancedload", () => {
-        disableEnhancedNavigation();
-        initializeCloudBlazor();
-    });
+export function afterWebStarted() {
+    initialize();
 }
