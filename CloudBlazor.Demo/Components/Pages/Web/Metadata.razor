@@ -1,0 +1,138 @@
+@page "/web/metadata"
+@inject CloudPage CloudPage
+@inject IOptionsSnapshot<CloudWebConfig> Config
+@using Microsoft.Extensions.Options
+
+<PageIntro Package="AngryMonkey.CloudBlazor.Web" Title="Page Metadata">
+    Every <code>&lt;head&gt;</code> metadata tag is set per page through the
+    <code>CloudPage</code> fluent API, with application-wide defaults behind it.
+</PageIntro>
+
+<section class="section">
+    <h2>Usage</h2>
+
+    <p>Inject <code>CloudPage</code> and configure it in <code>OnInitialized</code>.</p>
+
+    <pre><code>@@inject CloudPage CloudPage
+
+@@code {
+    protected override void OnInitialized() =&gt;
+        CloudPage
+            .SetTitle("Page Metadata")
+            .SetDescription("Per-page description, truncated at 160 characters.")
+            .SetKeywords("blazor, seo, meta")
+            .SetFavicon("/favicon.png")
+            .SetThemeColor("#4f8ef7");
+}</code></pre>
+</section>
+
+<section class="section">
+    <h2>Rendered for this page</h2>
+
+    <p>
+        Read back from the live <code>CloudPage</code> after defaults are merged in. View source
+        to see the matching tags in <code>&lt;head&gt;</code>.
+    </p>
+
+    <div class="result-grid">
+        <ResultRow Label="Title">
+            <code>@CloudPage.TitleResult(Config.Value)</code>
+        </ResultRow>
+        <ResultRow Label="Description">
+            <code>@CloudPage.DescriptionResult()</code>
+        </ResultRow>
+        <ResultRow Label="Keywords">
+            <code>@CloudPage.KeywordsResult()</code>
+        </ResultRow>
+        <ResultRow Label="Favicon">
+            <code>@(CloudPage.FaviconResult() ?? Config.Value.PageDefaults.FaviconResult())</code>
+        </ResultRow>
+        <ResultRow Label="Favicon type">
+            <code>@(CloudPage.FaviconTypeResult() ?? Config.Value.PageDefaults.FaviconTypeResult())</code>
+        </ResultRow>
+        <ResultRow Label="Title suffix">
+            <code>@Config.Value.TitleSuffix</code>
+        </ResultRow>
+    </div>
+</section>
+
+<section class="section">
+    <h2>Length limits</h2>
+
+    <p>
+        Two limits are enforced so generated tags stay inside what search engines display.
+        The title stops at <strong>64 characters</strong> — add-ons that would overflow are
+        dropped rather than truncated. Descriptions are truncated at <strong>160
+        characters</strong> with an ellipsis.
+    </p>
+
+    <div class="result-grid">
+        <ResultRow Label="Long description">
+            <code>@_truncatedSample</code>
+        </ResultRow>
+        <ResultRow Label="Result length">
+            <code>@_truncatedSample.Length characters</code>
+        </ResultRow>
+    </div>
+</section>
+
+<section class="section">
+    <h2>API</h2>
+
+    <div class="table-scroll">
+        <table class="api-table">
+            <thead>
+                <tr>
+                    <th>Method</th>
+                    <th>Description</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr><td><code>SetTitle(string)</code></td><td>Sets the title. Prefix and suffix are applied automatically.</td></tr>
+                <tr><td><code>SetDescription(string)</code></td><td>Sets the meta description. Truncated past 160 characters.</td></tr>
+                <tr><td><code>SetKeywords(string)</code></td><td>Sets the meta keywords tag.</td></tr>
+                <tr><td><code>SetFavicon(string)</code></td><td>Sets the favicon href and infers its MIME type.</td></tr>
+                <tr><td><code>SetThemeColor(string)</code></td><td>Sets the browser UI theme colour.</td></tr>
+                <tr><td><code>SetManifest(string)</code></td><td>Sets the web app manifest href.</td></tr>
+                <tr><td><code>SetTitleAddOns(IEnumerable&lt;string&gt;)</code></td><td>Appends title tokens within the 64-character limit.</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <p>Every setter returns <code>this</code> and raises <code>OnModified</code>, which re-renders the head.</p>
+</section>
+
+<section class="section">
+    <h2>Defaults</h2>
+
+    <p>Per-page values win over defaults through null-coalescing; unset values fall back.</p>
+
+    <pre><code>builder.Services.AddCloudWeb(config =>
+{
+    config.TitleSuffix = " · CloudBlazor";
+
+    config.PageDefaults
+        .SetTitle("CloudBlazor")
+        .SetDescription("Site-wide default description.")
+        .SetFavicon("/favicon.png")
+        .SetThemeColor("#4f8ef7");
+});</code></pre>
+</section>
+
+@code {
+    private string _truncatedSample = string.Empty;
+
+    protected override void OnInitialized()
+    {
+        CloudPage
+            .SetTitle("Page Metadata")
+            .SetDescription("Per-page title, description, keywords, favicon and theme colour, all set through the CloudPage fluent API.")
+            .SetKeywords("metadata, title, description, keywords, favicon, seo");
+
+        // Shown in the length-limits section without disturbing this page's own metadata.
+        CloudPage sample = new();
+        sample.SetDescription(new string('a', 200));
+
+        _truncatedSample = sample.DescriptionResult() ?? string.Empty;
+    }
+}

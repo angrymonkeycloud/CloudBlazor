@@ -1,14 +1,31 @@
-﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+<Project Sdk="Microsoft.NET.Sdk.Web">
 
-  <PropertyGroup>
-    <TargetFramework>net10.0</TargetFramework>
-    <Nullable>enable</Nullable>
-    <ImplicitUsings>enable</ImplicitUsings>
-    <BlazorDisableThrowNavigationException>true</BlazorDisableThrowNavigationException>
-  </PropertyGroup>
+	<PropertyGroup>
+		<RootNamespace>CloudBlazor.Demo</RootNamespace>
+		<AssemblyName>CloudBlazor.Demo</AssemblyName>
+		<IsPackable>false</IsPackable>
 
-  <ItemGroup>
-    <ProjectReference Include="..\CloudBlazor\CloudBlazor.csproj" />
-  </ItemGroup>
+		<!--
+			The demo deliberately compiles with no warnings suppressed. An earlier demo
+			hid RZ10012, which silently turned a mistyped component name into an inert
+			HTML element and made the managed head render nothing.
+		-->
+	</PropertyGroup>
+
+	<!--
+		mateconfig.json drives the CloudMate Less compiler, which runs in the editor
+		extension rather than during the build, so wwwroot/css/app.css is generated and
+		committed. Edit src/css/app.less and let CloudMate regenerate it.
+	-->
+	<ItemGroup>
+		<Content Remove="mateconfig.json" />
+		<None Include="mateconfig.json" CopyToOutputDirectory="Never" CopyToPublishDirectory="Never" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\CloudBlazor\CloudBlazor.csproj" />
+		<ProjectReference Include="..\CloudBlazor.Web\CloudBlazor.Web.csproj" />
+		<ProjectReference Include="..\CloudBlazor.App\CloudBlazor.App.csproj" />
+	</ItemGroup>
 
 </Project>

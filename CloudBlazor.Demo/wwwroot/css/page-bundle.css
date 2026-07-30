@@ -1,0 +1,8 @@
+/*
+ * Real file behind the per-page bundle shown on the Asset Bundles page, so the
+ * demo emits a tag that actually resolves instead of a 404.
+ */
+
+.demo-surface[data-page-bundle] {
+    border-color: var(--color-accent);
+}

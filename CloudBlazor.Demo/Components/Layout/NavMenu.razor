@@ -1,24 +1,70 @@
-﻿<div class="top-row ps-3 navbar navbar-dark">
-    <div class="container-fluid">
-        <a class="navbar-brand" href="">CloudBlazor.Demo</a>
+@rendermode InteractiveServer
+@inject IJSRuntime JS
+
+<aside class="sidebar">
+    <div class="sidebar-header">
+        <div class="sidebar-header-row">
+            @*
+                cloud-home-link is the CloudBlazor browser behavior: it scrolls to the
+                top when the page is scrolled, and suppresses redundant navigation when
+                the destination is already the current page.
+            *@
+            <a class="sidebar-title" href="" cloud-home-link>CloudBlazor</a>
+
+            <button type="button"
+                    class="theme-toggle"
+                    title="Toggle light and dark mode"
+                    @onclick="ToggleThemeAsync">
+                @_themeIcon
+            </button>
+        </div>
+        <span class="sidebar-version">net10.0 · 4 packages</span>
     </div>
-</div>
 
-<input type="checkbox" title="Navigation menu" class="navbar-toggler" />
-
-<div class="nav-scrollable" onclick="document.querySelector('.navbar-toggler').click()">
-    <nav class="nav flex-column">
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
-                <span class="bi bi-house-door-fill-nav-menu" aria-hidden="true"></span> Home
-            </NavLink>
+    <nav class="nav">
+        <div class="nav-group">
+            <NavLink class="nav-link" href="" Match="NavLinkMatch.All">Overview</NavLink>
         </div>
 
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="weather">
-                <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Weather
-            </NavLink>
+        <div class="nav-group">
+            <span class="nav-label">CloudBlazor</span>
+            <NavLink class="nav-link" href="behaviors/initialization">Initialization</NavLink>
+            <NavLink class="nav-link" href="behaviors/home-link">Home Link</NavLink>
+        </div>
+
+        <div class="nav-group">
+            <span class="nav-label">CloudBlazor.Web</span>
+            <NavLink class="nav-link" href="web/metadata">Page Metadata</NavLink>
+            <NavLink class="nav-link" href="web/bundles">Asset Bundles</NavLink>
+            <NavLink class="nav-link" href="web/features">CDN Features</NavLink>
+            <NavLink class="nav-link" href="web/robots">Robots Control</NavLink>
+            <NavLink class="nav-link" href="web/crawler">Crawler Detection</NavLink>
+        </div>
+
+        <div class="nav-group">
+            <span class="nav-label">CloudBlazor.App</span>
+            <NavLink class="nav-link" href="app/navigation">Navigation Service</NavLink>
         </div>
     </nav>
-</div>
+</aside>
 
+@code {
+    private const string SunIcon = "☀";
+    private const string MoonIcon = "☾";
+
+    private string _themeIcon = SunIcon;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!firstRender)
+            return;
+
+        SetIcon(await JS.InvokeAsync<string>("cloudBlazorDemoTheme.get"));
+
+        StateHasChanged();
+    }
+
+    private async Task ToggleThemeAsync() => SetIcon(await JS.InvokeAsync<string>("cloudBlazorDemoTheme.toggle"));
+
+    private void SetIcon(string theme) => _themeIcon = theme == "light" ? MoonIcon : SunIcon;
+}

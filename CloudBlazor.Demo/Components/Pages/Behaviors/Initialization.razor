@@ -1,0 +1,140 @@
+@page "/behaviors/initialization"
+@rendermode InteractiveServer
+@inject IJSRuntime JS
+@inject CloudPage CloudPage
+
+<PageIntro Package="AngryMonkey.CloudBlazor" Title="Initialization">
+    CloudBlazor has two independent ways to start. Which one applies depends on whether the
+    host loads a Blazor script at all.
+</PageIntro>
+
+<section class="section">
+    <h2>Live check</h2>
+
+    <p>
+        Reads the real browser state on this page. Both values come from the module that
+        <code>AngryMonkey.CloudBlazor</code> publishes as a static web asset.
+    </p>
+
+    <div class="result-grid">
+        <ResultRow Label="Initialized">
+            @if (_state is null)
+            {
+                <span class="badge">not checked yet</span>
+            }
+            else if (_state.Initialized)
+            {
+                <span class="badge badge-on">true</span>
+            }
+            else
+            {
+                <span class="badge badge-off">false</span>
+            }
+        </ResultRow>
+        <ResultRow Label="data-enhance-nav">
+            <code>@(_state?.EnhanceNav ?? "—")</code>
+        </ResultRow>
+    </div>
+
+    <div class="btn-row">
+        <button type="button" class="btn" @onclick="CheckAsync">Read browser state</button>
+    </div>
+
+    <div class="callout">
+        <p>
+            <code>data-enhance-nav="false"</code> on <code>&lt;body&gt;</code> is applied by
+            CloudBlazor. It opts the application out of Blazor enhanced navigation, so links
+            perform ordinary browser navigation.
+        </p>
+    </div>
+</section>
+
+<section class="section">
+    <h2>Path 1 — Blazor JS initializer</h2>
+
+    <p>
+        Hosts that load <code>blazor.web.js</code>, <code>blazor.server.js</code> or
+        <code>blazor.webassembly.js</code> need no configuration. The Blazor runtime discovers
+        <code>AngryMonkey.CloudBlazor.lib.module.js</code> from the package's static web assets
+        and calls it before and after startup.
+    </p>
+
+    <p>
+        The file name is not cosmetic: the SDK only recognises an initializer named
+        <code>{PackageId}.lib.module.js</code>. Renaming the package without renaming the file
+        silently disables this path, which is why a test in
+        <code>CloudBlazor.Tests</code> asserts the two stay in sync.
+    </p>
+
+    <p>
+        This works through a chain of references too. An application that references only
+        <code>CloudBlazor.Web</code> or <code>CloudBlazor.App</code> still receives the
+        initializer, because both are Razor Class Libraries and propagate the static web assets
+        of <code>CloudBlazor</code>.
+    </p>
+</section>
+
+<section class="section">
+    <h2>Path 2 — explicit script</h2>
+
+    <p>
+        A plain MVC site, a Razor Pages site, or a statically rendered page with no Blazor
+        runtime has no initializer pipeline, so path 1 cannot run. Those hosts load the module
+        directly:
+    </p>
+
+    <pre><code>&lt;head&gt;
+    &lt;CloudBlazorScript /&gt;
+&lt;/head&gt;</code></pre>
+
+    <p>
+        <code>CloudBlazor.Web</code> does this for you. Because it already owns the head, it
+        emits the script as part of the managed head content, so any CloudWeb site initializes
+        regardless of hosting model. Opt out when the host does not need it:
+    </p>
+
+    <pre><code>builder.Services.AddCloudWeb(config =>
+{
+    config.IncludeCloudBlazorScript = false;
+});</code></pre>
+
+    <p>
+        Running both paths is safe. Initialization is guarded, so the second call returns
+        immediately.
+    </p>
+</section>
+
+<section class="section">
+    <h2>Asset paths</h2>
+
+    <p>Referenced from C# through <code>CloudBlazorAssets</code> rather than hard-coded strings.</p>
+
+    <div class="result-grid">
+        <ResultRow Label="Content root">
+            <code>@CloudBlazorAssets.ContentRoot</code>
+        </ResultRow>
+        <ResultRow Label="Initializer">
+            <code>@CloudBlazorAssets.InitializerScriptName</code>
+        </ResultRow>
+        <ResultRow Label="Module">
+            <code>@CloudBlazorAssets.ScriptPath</code>
+        </ResultRow>
+        <ResultRow Label="Auto initializer">
+            <code>@CloudBlazorAssets.AutoInitializerScriptPath</code>
+        </ResultRow>
+    </div>
+</section>
+
+@code {
+    private BrowserState? _state;
+
+    protected override void OnInitialized() =>
+        CloudPage
+            .SetTitle("Initialization")
+            .SetDescription("How CloudBlazor starts its browser behaviors across every hosting model, and how to verify it in a live page.");
+
+    private async Task CheckAsync() =>
+        _state = await JS.InvokeAsync<BrowserState>("cloudBlazorDemoDiagnostics.readInitializationState");
+
+    private sealed record BrowserState(bool Initialized, string EnhanceNav);
+}

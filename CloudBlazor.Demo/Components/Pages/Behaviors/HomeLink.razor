@@ -1,0 +1,119 @@
+@page "/behaviors/home-link"
+@rendermode InteractiveServer
+@inject IJSRuntime JS
+@inject CloudPage CloudPage
+
+<PageIntro Package="AngryMonkey.CloudBlazor" Title="Home Link">
+    Add one attribute to an anchor and it gains scroll-to-top and redundant-navigation
+    suppression. No component wrapper, no per-page wiring.
+</PageIntro>
+
+<section class="section">
+    <h2>Usage</h2>
+
+    <pre><code>&lt;a href="" cloud-home-link&gt;CloudBlazor&lt;/a&gt;</code></pre>
+
+    <p>The behavior runs in this order on a left click:</p>
+
+    <ol>
+        <li>Page scrolled past the threshold → prevent navigation and smooth-scroll to the top.</li>
+        <li>Already on the destination page → prevent the redundant navigation.</li>
+        <li>Otherwise → let the anchor navigate normally.</li>
+    </ol>
+
+    <p>
+        Modified clicks (<kbd>Ctrl</kbd>, <kbd>Shift</kbd>, <kbd>Alt</kbd>, <kbd>Cmd</kbd>),
+        middle clicks, downloads, external targets, and non-HTTP protocols are always left to
+        the browser.
+    </p>
+</section>
+
+<section class="section">
+    <h2>Try it</h2>
+
+    <p>
+        The sidebar's <strong>CloudBlazor</strong> title carries the attribute. Scroll down past
+        the marker, then click it: the page scrolls back to the top instead of navigating.
+    </p>
+
+    <div class="result-grid">
+        <ResultRow Label="Scroll position">
+            <code>@(_scrollY?.ToString() ?? "—")px</code>
+        </ResultRow>
+        <ResultRow Label="Threshold">
+            <code>8px (default)</code>
+        </ResultRow>
+    </div>
+
+    <div class="btn-row">
+        <button type="button" class="btn" @onclick="ReadScrollAsync">Read scroll position</button>
+    </div>
+
+    <div class="scroll-probe">Scroll down — the sidebar link is a home link</div>
+
+    <p>Anchors below opt out or adjust the behavior.</p>
+
+    <div class="demo-surface">
+        <div class="btn-row">
+            <a class="btn btn-secondary" href="" cloud-home-link cloud-scroll-threshold="400">
+                Threshold 400px
+            </a>
+            <a class="btn btn-secondary" href="" cloud-home-link cloud-scroll-behavior="instant">
+                Instant scroll
+            </a>
+            <a class="btn btn-secondary" href="" cloud-home-link cloud-behavior-disabled>
+                Behavior disabled
+            </a>
+        </div>
+    </div>
+</section>
+
+<section class="section">
+    <h2>Attributes</h2>
+
+    <div class="table-scroll">
+        <table class="api-table">
+            <thead>
+                <tr>
+                    <th>Attribute</th>
+                    <th>Default</th>
+                    <th>Description</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><code>cloud-home-link</code></td>
+                    <td>—</td>
+                    <td>Marks the anchor as a home link. Required to opt in.</td>
+                </tr>
+                <tr>
+                    <td><code>cloud-scroll-threshold</code></td>
+                    <td><code>8</code></td>
+                    <td>Pixels of scroll before a click scrolls to the top instead of navigating.</td>
+                </tr>
+                <tr>
+                    <td><code>cloud-scroll-behavior</code></td>
+                    <td><code>smooth</code></td>
+                    <td>Scroll behavior: <code>smooth</code>, <code>auto</code>, or <code>instant</code>.</td>
+                </tr>
+                <tr>
+                    <td><code>cloud-behavior-disabled</code></td>
+                    <td>—</td>
+                    <td>Opts a single anchor out, leaving it to the browser.</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</section>
+
+@code {
+    private int? _scrollY;
+
+    protected override void OnInitialized() =>
+        CloudPage
+            .SetTitle("Home Link")
+            .SetDescription("The cloud-home-link browser behavior: scroll to top when scrolled, and suppress redundant navigation.");
+
+    private async Task ReadScrollAsync() =>
+        _scrollY = await JS.InvokeAsync<int>("cloudBlazorDemoDiagnostics.readScrollPosition");
+}

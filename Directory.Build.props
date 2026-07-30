@@ -1,0 +1,36 @@
+<Project>
+
+	<!--
+		Shared build configuration for every project in the repository.
+
+		Package version and the metadata properties listed in CloudBlazor.Package
+		(Authors, Company, AssemblyVersion, FileVersion, PackageIcon) intentionally
+		stay in the individual project files: CloudPack rewrites them in place when
+		a release is published.
+	-->
+
+	<PropertyGroup>
+		<TargetFramework>net10.0</TargetFramework>
+		<Nullable>enable</Nullable>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<LangVersion>latest</LangVersion>
+	</PropertyGroup>
+
+	<PropertyGroup>
+		<Authors>Angry Monkey</Authors>
+		<Company>Angry Monkey</Company>
+		<Copyright>Copyright © Angry Monkey Cloud</Copyright>
+		<PackageProjectUrl>https://angrymonkeycloud.com/cloudblazor</PackageProjectUrl>
+		<RepositoryUrl>https://github.com/angrymonkeycloud/CloudBlazor</RepositoryUrl>
+		<RepositoryType>git</RepositoryType>
+		<PackageLicenseExpression>MIT</PackageLicenseExpression>
+		<PackageOutputPath>$(MSBuildThisFileDirectory)NugetPackages\</PackageOutputPath>
+	</PropertyGroup>
+
+	<!--
+		Packaging metadata that depends on IsPackable lives in Directory.Build.targets.
+		This file is imported before the project body, so IsPackable is not set yet and
+		a condition on it here would silently never match.
+	-->
+
+</Project>

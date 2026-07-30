@@ -1,18 +1,17 @@
 <Solution>
-  <Folder Name="/CloudApp/">
-    <Project Path="CloudApp.Maui/CloudApp.Maui.csproj" />
-    <Project Path="CloudApp.Packing/CloudApp.Packing.csproj" />
-    <Project Path="CloudApp/CloudApp.csproj" />
+  <Folder Name="/Libraries/">
+    <Project Path="CloudBlazor/CloudBlazor.csproj" />
+    <Project Path="CloudBlazor.Web/CloudBlazor.Web.csproj" />
+    <Project Path="CloudBlazor.App/CloudBlazor.App.csproj" />
+    <Project Path="CloudBlazor.App.Maui/CloudBlazor.App.Maui.csproj" />
   </Folder>
-  <Folder Name="/CloudWeb/">
-    <Project Path="CloudWeb.Demo/CloudWeb.Demo.csproj" />
-    <Project Path="CloudWeb.Nuget/CloudWeb.Nuget.csproj" />
-    <Project Path="CloudWeb.Tests/CloudWeb.Tests.csproj" />
-    <Project Path="CloudWeb/CloudWeb.csproj" />
-  </Folder>
-  <Folder Name="/Solution Folder/">
+  <Folder Name="/Solution Items/">
+    <File Path="Directory.Build.props" />
+    <File Path="LICENSE" />
     <File Path="README.md" />
+    <File Path=".github/workflows/tests.yml" />
   </Folder>
-  <Project Path="CloudBlazor.Demo/CloudBlazor.Demo.csproj" Id="c8b6801a-2580-4657-becc-c1f77a79e29e" />
-  <Project Path="CloudBlazor/CloudBlazor.csproj" Id="fdf9713f-6b7f-4da8-aabb-975f46f8c7bf" />
+  <Project Path="CloudBlazor.Demo/CloudBlazor.Demo.csproj" />
+  <Project Path="CloudBlazor.Package/CloudBlazor.Package.csproj" />
+  <Project Path="CloudBlazor.Tests/CloudBlazor.Tests.csproj" />
 </Solution>

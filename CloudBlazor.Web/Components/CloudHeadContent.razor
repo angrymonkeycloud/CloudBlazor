@@ -1,0 +1,11 @@
+@namespace AngryMonkey.CloudBlazor.Web
+
+@*
+    Renders the managed head content into the section marked by CloudHeadPlaceholder.
+    Place this once, next to the router in Routes.razor.
+*@
+
+<SectionContent SectionName="@CloudWebSections.Head">
+    <CloudHeadInit />
+    <HeadOutlet />
+</SectionContent>

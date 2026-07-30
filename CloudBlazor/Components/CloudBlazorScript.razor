@@ -1,0 +1,26 @@
+@namespace AngryMonkey.CloudBlazor
+
+@*
+    Loads CloudBlazor's browser behaviors explicitly.
+
+    Blazor hosts do not need this component: the package ships a JS initializer that
+    the Blazor runtime discovers on its own. Render it in hosts that never load a
+    Blazor script — MVC, Razor Pages, or a statically rendered site — where no
+    initializer pipeline exists.
+
+    Rendering it in a Blazor host anyway is safe; initialization is idempotent.
+*@
+
+<script type="module" src="@ResolvedSource" defer></script>
+
+@code {
+    /// <summary>
+    /// Overrides the script URL. Defaults to the module published by this package.
+    /// Set it when the application rewrites static asset paths, for example behind a CDN.
+    /// </summary>
+    [Parameter] public string? Source { get; set; }
+
+    private string ResolvedSource => string.IsNullOrWhiteSpace(Source)
+        ? CloudBlazorAssets.AutoInitializerScriptPath
+        : Source;
+}

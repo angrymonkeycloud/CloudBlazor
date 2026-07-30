@@ -1,0 +1,118 @@
+name: Tests
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: tests-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  DOTNET_NOLOGO: true
+  DOTNET_CLI_TELEMETRY_OPTOUT: true
+  DOTNET_SKIP_FIRST_TIME_EXPERIENCE: true
+
+jobs:
+  test:
+    name: Build and test
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+
+      - name: Restore
+        run: dotnet restore CloudBlazor.slnx
+
+      # Warnings are surfaced rather than suppressed: an unnoticed RZ10012 once turned a
+      # mistyped component name into an inert HTML element and silently broke the head.
+      - name: Build
+        run: dotnet build CloudBlazor.slnx --configuration Release --no-restore
+
+      - name: Test
+        run: >-
+          dotnet test CloudBlazor.Tests/CloudBlazor.Tests.csproj
+          --configuration Release
+          --no-build
+          --logger "trx;LogFileName=test-results.trx"
+          --results-directory TestResults
+          --collect:"XPlat Code Coverage"
+
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results
+          path: TestResults
+          if-no-files-found: warn
+
+  pack:
+    name: Validate packages
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+
+      # Every library used to fail `dotnet pack` with NU5039, and CloudBlazor.Web once
+      # shipped 23 MB of unrelated content files. Packing on every push is what keeps
+      # either from coming back unnoticed.
+      - name: Pack every library
+        run: |
+          set -euo pipefail
+          for project in CloudBlazor CloudBlazor.Web CloudBlazor.App CloudBlazor.App.Maui; do
+            dotnet pack "$project/$project.csproj" --configuration Release -o artifacts
+          done
+
+      - name: Check package contents
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          # A package larger than this means unintended content files leaked back in.
+          maximum_bytes=$((2 * 1024 * 1024))
+          failed=0
+
+          for package in artifacts/*.nupkg; do
+            size=$(stat -c%s "$package")
+            echo "$package ($size bytes)"
+
+            if [ "$size" -gt "$maximum_bytes" ]; then
+              echo "::error::$package is $size bytes, over the $maximum_bytes byte budget."
+              failed=1
+            fi
+
+            for required in README.md amc-logo.png; do
+              if ! unzip -l "$package" | grep -q " $required$"; then
+                echo "::error::$package is missing $required."
+                failed=1
+              fi
+            done
+          done
+
+          exit "$failed"
+
+      - name: Upload packages
+        uses: actions/upload-artifact@v4
+        with:
+          name: packages
+          path: artifacts

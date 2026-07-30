@@ -1,0 +1,104 @@
+@page "/web/features"
+@inject CloudPage CloudPage
+
+<PageIntro Package="AngryMonkey.CloudBlazor.Web" Title="CDN Features">
+    Add a feature flag and CloudWeb injects the matching CDN dependency into the head, with
+    the integrity and crossorigin attributes already set.
+</PageIntro>
+
+<section class="section">
+    <h2>Usage</h2>
+
+    <pre><code>CloudPage.AddFeature(CloudPageFeatures.JQuery);
+
+// Or several at once
+CloudPage.AddFeatures(CloudPageFeatures.JQuery);</code></pre>
+</section>
+
+<section class="section">
+    <h2>Enabled on this page</h2>
+
+    <div class="result-grid">
+        @if (CloudPage.Features.Count == 0)
+        {
+            <ResultRow Label="Features">
+                <span class="badge">none</span>
+            </ResultRow>
+        }
+        else
+        {
+            @foreach (CloudPageFeatures feature in CloudPage.Features)
+            {
+                <ResultRow Label="Feature">
+                    <code>@feature</code>
+                    <span class="badge badge-on">injected</span>
+                </ResultRow>
+            }
+        }
+    </div>
+
+    <p>
+        View source: the jQuery tag appears in <code>&lt;head&gt;</code> ahead of the page
+        bundles, because a dependency has to load before the code that uses it.
+    </p>
+</section>
+
+<section class="section">
+    <h2>Available features</h2>
+
+    <div class="table-scroll">
+        <table class="api-table">
+            <thead>
+                <tr>
+                    <th>Feature</th>
+                    <th>Injected dependency</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><code>CloudPageFeatures.JQuery</code></td>
+                    <td>jQuery 3.6.4 from <code>code.jquery.com</code>, with subresource integrity</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="callout">
+        <p>
+            Add a new value to <code>CloudPageFeatures</code> and a matching block in
+            <code>CloudBundles.razor</code> to extend the set.
+        </p>
+    </div>
+</section>
+
+<section class="section">
+    <h2>Legacy exports shim</h2>
+
+    <p>
+        Older CommonJS bundles expect a global <code>exports</code> object. Declaring it ahead
+        of every bundle on the page keeps those scripts from throwing.
+    </p>
+
+    <pre><code>CloudPage.SetAddLegacyExportsCreation(true);</code></pre>
+
+    <div class="result-grid">
+        <ResultRow Label="Shim on this page">
+            @if (CloudPage.AddLegacyExportsCreation ?? false)
+            {
+                <span class="badge badge-on">enabled</span>
+            }
+            else
+            {
+                <span class="badge badge-off">disabled</span>
+            }
+        </ResultRow>
+    </div>
+</section>
+
+@code {
+    protected override void OnInitialized() =>
+        CloudPage
+            .SetTitle("CDN Features")
+            .SetDescription("Feature flags that inject their CDN dependency into the page head automatically.")
+            .AddFeature(CloudPageFeatures.JQuery);
+}

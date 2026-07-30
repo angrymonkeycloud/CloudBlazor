@@ -1,0 +1,105 @@
+@page "/web/crawler"
+@inject CloudPage CloudPage
+
+<PageIntro Package="AngryMonkey.CloudBlazor.Web" Title="Crawler Detection">
+    <code>CloudPage.IsCrawler</code> is resolved from the request's <code>User-Agent</code> on
+    construction, so a page can serve a simplified response to bots with no middleware.
+</PageIntro>
+
+<section class="section">
+    <h2>This request</h2>
+
+    <div class="result-grid">
+        <ResultRow Label="Detected as">
+            @if (CloudPage.IsCrawler)
+            {
+                <span class="badge badge-off">crawler</span>
+            }
+            else
+            {
+                <span class="badge badge-on">human</span>
+            }
+        </ResultRow>
+        <ResultRow Label="User-Agent">
+            <code>@_userAgent</code>
+        </ResultRow>
+        <ResultRow Label="Known substrings">
+            <code>@CloudWebConfig.CrawlersUserAgents.Count</code>
+        </ResultRow>
+    </div>
+
+    <p>
+        To see it flip, request this page with a bot user agent:
+    </p>
+
+    <pre><code>curl -A "Googlebot/2.1 (+http://www.google.com/bot.html)" http://localhost:5000/web/crawler</code></pre>
+</section>
+
+<section class="section">
+    <h2>Usage</h2>
+
+    <pre><code>@@inject CloudPage CloudPage
+
+@@if (CloudPage.IsCrawler)
+{
+    &lt;ServerRenderedSummary /&gt;
+}
+else
+{
+    &lt;InteractiveExperience /&gt;
+}</code></pre>
+
+    <p>MVC controllers deriving from <code>CloudController</code> use the helper instead.</p>
+
+    <pre><code>public IActionResult Index() => IsCrawler() ? View("IndexSimple") : View();</code></pre>
+</section>
+
+<section class="section">
+    <h2>Matching</h2>
+
+    <p>
+        The user agent is lower-cased and tested against a list of lower-cased substrings.
+        Normalizing both sides is what makes entries such as <code>Baiduspider</code> or
+        <code>AhrefsBot</code> match at all — comparing a lower-cased agent against a
+        mixed-case list silently never matches.
+    </p>
+
+    <div class="table-scroll">
+        <table class="api-table">
+            <thead>
+                <tr>
+                    <th>Category</th>
+                    <th>Examples</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr><td>Search engines</td><td><code>googlebot</code>, <code>bingbot</code>, <code>baiduspider</code></td></tr>
+                <tr><td>Generic patterns</td><td><code>bot</code>, <code>crawler</code>, <code>spider</code></td></tr>
+                <tr><td>Command-line tools</td><td><code>wget</code>, <code>curl</code></td></tr>
+                <tr><td>SEO and auditing</td><td><code>ahrefsbot</code>, <code>blexbot</code></td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <p>The check is also available directly, which is what the tests exercise.</p>
+
+    <pre><code>bool isCrawler = CloudWebConfig.IsCrawler(userAgent);</code></pre>
+</section>
+
+@code {
+    [CascadingParameter] private HttpContext? HttpContext { get; set; }
+
+    private string _userAgent = "(none)";
+
+    protected override void OnInitialized()
+    {
+        CloudPage
+            .SetTitle("Crawler Detection")
+            .SetDescription("Detect search engine crawlers from the request user agent and adapt the response.");
+
+        string? userAgent = HttpContext?.Request.Headers.UserAgent.ToString();
+
+        if (!string.IsNullOrWhiteSpace(userAgent))
+            _userAgent = userAgent;
+    }
+}

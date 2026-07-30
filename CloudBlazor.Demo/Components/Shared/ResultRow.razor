@@ -1,0 +1,16 @@
+@*
+    One label/value line inside a .result-grid readout.
+*@
+
+<div class="result-row">
+    <span class="result-label">@Label</span>
+    <span class="result-value">@ChildContent</span>
+</div>
+
+@code {
+    /// <summary>Label shown on the left.</summary>
+    [Parameter, EditorRequired] public required string Label { get; set; }
+
+    /// <summary>Value shown on the right.</summary>
+    [Parameter, EditorRequired] public required RenderFragment ChildContent { get; set; }
+}

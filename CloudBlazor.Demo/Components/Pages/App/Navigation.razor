@@ -1,0 +1,197 @@
+@page "/app/navigation"
+@rendermode InteractiveServer
+@implements IDisposable
+@inject INavigationService Nav
+@inject CloudPage CloudPage
+
+<PageIntro Package="AngryMonkey.CloudBlazor.App" Title="Navigation Service">
+    One <code>INavigationService</code> contract, resolved to the implementation that fits the
+    host. Shared page hierarchy and popup state, platform-specific navigation.
+</PageIntro>
+
+<section class="section">
+    <h2>Registration</h2>
+
+    <p>Each host registers the implementation that matches it; application code stays the same.</p>
+
+    <pre><code>// Browser: WebAssembly, Server, Blazor Web Apps
+builder.Services.AddCloudApp();
+
+// .NET MAUI Blazor Hybrid
+builder.Services.AddCloudAppMaui();</code></pre>
+</section>
+
+<section class="section">
+    <h2>Live state</h2>
+
+    <div class="result-grid">
+        <ResultRow Label="Implementation">
+            <code>@Nav.GetType().Name</code>
+        </ResultRow>
+        <ResultRow Label="Web platform">
+            @if (Nav.IsWebPlatform)
+            {
+                <span class="badge badge-on">true</span>
+            }
+            else
+            {
+                <span class="badge badge-off">false</span>
+            }
+        </ResultRow>
+        <ResultRow Label="Current page">
+            <code>@Nav.CurrentPage</code>
+        </ResultRow>
+        <ResultRow Label="Show back button">
+            @if (Nav.ShouldShowBackButton)
+            {
+                <span class="badge badge-on">true</span>
+            }
+            else
+            {
+                <span class="badge badge-off">false</span>
+            }
+        </ResultRow>
+        <ResultRow Label="Popup open">
+            @if (Nav.IsPopupOpen)
+            {
+                <span class="badge badge-on">true</span>
+            }
+            else
+            {
+                <span class="badge badge-off">false</span>
+            }
+        </ResultRow>
+        <ResultRow Label="Path">
+            <code>@Nav.PathUri</code>
+        </ResultRow>
+        <ResultRow Label="Base URI">
+            <code>@Nav.BaseUri</code>
+        </ResultRow>
+    </div>
+
+    <p>
+        The page hierarchy drives back-button visibility. <code>Home</code> is the root, so the
+        back button stays hidden there and appears everywhere else.
+    </p>
+
+    <div class="btn-row">
+        <button type="button" class="btn" @onclick='() => Nav.SetCurrentPage("Home")'>
+            Set page: Home
+        </button>
+        <button type="button" class="btn" @onclick='() => Nav.SetCurrentPage("Details")'>
+            Set page: Details
+        </button>
+        <button type="button" class="btn btn-secondary" @onclick="TogglePopup">
+            @(Nav.IsPopupOpen ? "Close popup" : "Open popup")
+        </button>
+    </div>
+
+    @if (_pageChanges.Count > 0)
+    {
+        <p><code>OnPageChanged</code> fired for: @string.Join(" → ", _pageChanges)</p>
+    }
+
+    <div class="callout">
+        <p>
+            <code>SetCurrentPage</code> raises <code>OnPageChanged</code> only when the value
+            actually changes, so repeating the same page does not re-render subscribers.
+        </p>
+    </div>
+</section>
+
+<section class="section">
+    <h2>Popup-aware navigation</h2>
+
+    <p>
+        With a popup open, <code>NavigateToAsync</code> replaces the current history entry rather
+        than pushing a new one, so dismissing the popup does not leave a dead entry behind.
+        <code>TryNavigateBack</code> returns <code>false</code> on the root page with no popup
+        open, which is the signal a MAUI host uses to let the hardware back button exit the app.
+    </p>
+
+    <div class="result-grid">
+        <ResultRow Label="TryNavigateBack would">
+            @if (Nav.ShouldShowBackButton || Nav.IsPopupOpen)
+            {
+                <span class="badge badge-on">navigate back</span>
+            }
+            else
+            {
+                <span class="badge badge-off">return false</span>
+            }
+        </ResultRow>
+    </div>
+</section>
+
+<section class="section">
+    <h2>External links</h2>
+
+    <p>
+        <code>NavigateToExternalAsync</code> is where the implementations diverge. The web
+        service hands the URL to <code>window.open</code> or <code>window.location.assign</code>
+        — passed as an argument, never concatenated into a script string. The MAUI service sends
+        it to the platform launcher, so <code>tel:</code>, <code>mailto:</code>,
+        <code>sms:</code> and <code>geo:</code> open their native handler instead of the
+        <code>BlazorWebView</code>.
+    </p>
+
+    <pre><code>await Nav.NavigateToExternalAsync("https://angrymonkeycloud.com", newTab: true);</code></pre>
+
+    <div class="btn-row">
+        <button type="button" class="btn btn-secondary" @onclick="OpenExternalAsync">
+            Open angrymonkeycloud.com in a new tab
+        </button>
+    </div>
+</section>
+
+<section class="section">
+    <h2>Contract</h2>
+
+    <div class="table-scroll">
+        <table class="api-table">
+            <thead>
+                <tr>
+                    <th>Member</th>
+                    <th>Description</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr><td><code>NavigateToAsync</code></td><td>Routes to a path, replacing the entry when a popup is open.</td></tr>
+                <tr><td><code>NavigateBackAsync</code></td><td>Goes back, falling back to the root if history is unavailable.</td></tr>
+                <tr><td><code>TryNavigateBack</code></td><td>Attempts back navigation; <code>false</code> when none is possible.</td></tr>
+                <tr><td><code>NavigateToExternalAsync</code></td><td>Leaves the application through the platform's mechanism.</td></tr>
+                <tr><td><code>SoftNavigate</code></td><td>Pushes a history entry and raises <code>NavigateRequest</code>.</td></tr>
+                <tr><td><code>SetCurrentPage</code> / <code>CurrentPage</code></td><td>Tracks position in the page hierarchy.</td></tr>
+                <tr><td><code>IsPopupOpen</code></td><td>Popup state that alters back-navigation behaviour.</td></tr>
+                <tr><td><code>ToBaseRelativePath</code></td><td>Absolute URI to router-relative path; empty for anything outside the base.</td></tr>
+            </tbody>
+        </table>
+    </div>
+</section>
+
+@code {
+    private readonly List<string> _pageChanges = [];
+
+    protected override void OnInitialized()
+    {
+        CloudPage
+            .SetTitle("Navigation Service")
+            .SetDescription("The INavigationService contract shared by browser and MAUI hosts, with live page hierarchy and popup state.");
+
+        Nav.OnPageChanged += OnPageChanged;
+    }
+
+    private void OnPageChanged(string page)
+    {
+        _pageChanges.Add(page);
+
+        InvokeAsync(StateHasChanged);
+    }
+
+    private void TogglePopup() => Nav.IsPopupOpen = !Nav.IsPopupOpen;
+
+    private Task OpenExternalAsync() =>
+        Nav.NavigateToExternalAsync("https://angrymonkeycloud.com", newTab: true);
+
+    public void Dispose() => Nav.OnPageChanged -= OnPageChanged;
+}

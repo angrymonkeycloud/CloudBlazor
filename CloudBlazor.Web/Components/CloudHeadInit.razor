@@ -1,0 +1,68 @@
+﻿@namespace AngryMonkey.CloudBlazor.Web
+@implements IDisposable
+@using Microsoft.AspNetCore.Http
+@using Microsoft.Extensions.Options
+
+@inject IOptionsSnapshot<CloudWebConfig> cloudWeb
+@inject CloudPage _page
+@inject IHttpContextAccessor _accessor
+
+@{
+    CloudPage pageConfig = PageConfig;
+}
+
+<CloudHead CloudPage="pageConfig" />
+<CloudBundles CloudPage="pageConfig" />
+
+@if (cloudWeb.Value.IncludeCloudBlazorScript)
+{
+    <CloudBlazorScript />
+}
+
+@code {
+
+    protected CloudPage PageConfig
+    {
+        get
+        {
+            _page ??= new(_accessor);
+
+            CloudPage config = new(_accessor)
+                {
+                    // Nullable
+
+                    Title = _page.Title,
+                    Keywords = _page.Keywords ?? cloudWeb.Value.PageDefaults.Keywords,
+                    Description = _page.Description ?? cloudWeb.Value.PageDefaults.Description,
+                    AddLegacyExportsCreation = _page.AddLegacyExportsCreation ?? cloudWeb.Value.PageDefaults.AddLegacyExportsCreation,
+                    ThemeColor = _page.ThemeColor ?? cloudWeb.Value.PageDefaults.ThemeColor,
+                    Manifest = _page.Manifest ?? cloudWeb.Value.PageDefaults.Manifest,
+
+                    // Not Nullable
+
+                    Favicon = _page.Favicon ?? cloudWeb.Value.PageDefaults.Favicon,
+                    IndexPage = _page.IndexPage ?? cloudWeb.Value.PageDefaults.IndexPage ?? true,
+                    FollowPage = _page.FollowPage ?? cloudWeb.Value.PageDefaults.FollowPage ?? true,
+                };
+
+            config.SetTitleAddOns(_page.TitleAddOns ?? cloudWeb.Value.PageDefaults.TitleAddOns);
+
+            config._bundles.Clear();
+            config._bundles.AddRange(cloudWeb.Value.PageDefaults.Bundles);
+            config._bundles.AddRange(_page.Bundles);
+
+
+            config._features.Clear();
+            config._features.AddRange(cloudWeb.Value.PageDefaults.Features);
+            config._features.AddRange(_page.Features);
+
+            return config;
+        }
+    }
+
+    protected override void OnInitialized() => _page.OnModified += OnPageModified;
+
+    private void OnPageModified() => _ = InvokeAsync(StateHasChanged);
+
+    public void Dispose() => _page.OnModified -= OnPageModified;
+}

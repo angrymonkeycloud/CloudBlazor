@@ -1,39 +1,27 @@
-﻿<Project Sdk="Microsoft.NET.Sdk.Razor">
+<Project Sdk="Microsoft.NET.Sdk.Razor">
 
 	<PropertyGroup>
-		<TargetFramework>net10.0</TargetFramework>
-
-		<Nullable>enable</Nullable>
-		<ImplicitUsings>enable</ImplicitUsings>
-
 		<AssemblyName>AngryMonkey.CloudBlazor</AssemblyName>
 		<RootNamespace>AngryMonkey.CloudBlazor</RootNamespace>
 		<PackageId>AngryMonkey.CloudBlazor</PackageId>
 
 		<Product>Cloud Blazor</Product>
 		<Description>Shared Blazor components and browser behaviors for static SSR, interactive Blazor, WebAssembly, and .NET MAUI Blazor Hybrid.</Description>
+		<PackageTags>blazor;razor;components;webassembly;maui;ssr;angrymonkey</PackageTags>
 
 		<Version>1.0.0</Version>
-		<Authors>Angry Monkey</Authors>
-		<Company>Angry Monkey</Company>
-
-		<IsPackable>true</IsPackable>
-		<PackageProjectUrl>https://angrymonkeycloud.com/cloudblazor</PackageProjectUrl>
-		<RepositoryUrl>https://github.com/angrymonkeycloud/CloudBlazor</RepositoryUrl>
-		<RepositoryType>git</RepositoryType>
-
-		<PackageReadmeFile>README.md</PackageReadmeFile>
-		<PackageIcon>amc-logo.png</PackageIcon>
-
-		<PackageOutputPath>..\NugetPackages\</PackageOutputPath>
-
 		<AssemblyVersion>$(PackageVersion)</AssemblyVersion>
 		<FileVersion>$(PackageVersion)</FileVersion>
+
+		<IsPackable>true</IsPackable>
 	</PropertyGroup>
 
 	<ItemGroup>
+		<SupportedPlatform Include="browser" />
+	</ItemGroup>
 
-		<None Update="amc-logo.png" Pack="true" PackagePath="\" />
+	<ItemGroup>
+		<PackageReference Include="Microsoft.AspNetCore.Components.Web" Version="10.0.10" />
 	</ItemGroup>
 
 </Project>

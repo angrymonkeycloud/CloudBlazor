@@ -1,25 +1,51 @@
+using AngryMonkey.CloudBlazor.Web;
 using CloudBlazor.Demo.Components;
 
-var builder = WebApplication.CreateBuilder(args);
+WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-builder.Services.AddRazorComponents();
+// Interactive server components power the CloudBlazor.App navigation pages; the
+// CloudBlazor.Web pages are rendered statically, which is the mode most websites use.
+builder.Services.AddRazorComponents().AddInteractiveServerComponents();
 
-var app = builder.Build();
+// CloudBlazor.Web owns the <head>: metadata, robots directives and asset bundles.
+builder.Services.AddCloudWeb(config =>
+{
+    config.TitleSuffix = " · CloudBlazor";
 
-// Configure the HTTP request pipeline.
+    config.PageDefaults
+        .SetTitle("CloudBlazor")
+        .SetDescription("CloudBlazor is the foundation of the Angry Monkey Cloud Blazor ecosystem: reusable UI, browser behaviors, website infrastructure and application features.")
+        .SetKeywords("blazor, razor, components, seo, metadata, bundles, webassembly, maui")
+        .SetFavicon("/favicon.png")
+        .SetThemeColor("#4f8ef7")
+        .AppendBundle(new CloudBundle
+        {
+            Source = "css/app.css",
+            MinOnRelease = false,
+            AppendVersion = true
+        });
+});
+
+// CloudBlazor.App supplies INavigationService for browser-hosted applications.
+builder.Services.AddCloudApp();
+
+WebApplication app = builder.Build();
+
 if (!app.Environment.IsDevelopment())
 {
-    app.UseExceptionHandler("/Error", createScopeForErrors: true);
-    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
+    app.UseExceptionHandler("/error", createScopeForErrors: true);
     app.UseHsts();
 }
+
 app.UseStatusCodePagesWithReExecute("/not-found", createScopeForStatusCodePages: true);
 app.UseHttpsRedirection();
 
+// MapStaticAssets serves the fingerprinted static web assets that CloudBlazor
+// publishes, including its JS initializer.
+app.MapStaticAssets();
+
 app.UseAntiforgery();
 
-app.MapStaticAssets();
-app.MapRazorComponents<App>();
+app.MapRazorComponents<App>().AddInteractiveServerRenderMode();
 
 app.Run();

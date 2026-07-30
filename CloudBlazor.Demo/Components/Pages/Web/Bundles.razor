@@ -1,0 +1,128 @@
+@page "/web/bundles"
+@inject CloudPage CloudPage
+
+<PageIntro Package="AngryMonkey.CloudBlazor.Web" Title="Asset Bundles">
+    CSS and JavaScript are appended per page or application-wide. CloudWeb renders the tags,
+    inserts the minified variant, and stamps a cache-busting version.
+</PageIntro>
+
+<section class="section">
+    <h2>Appending</h2>
+
+    <pre><code>// By path
+CloudPage.AppendBundle("css/page.css");
+CloudPage.AppendBundles("css/a.css", "js/b.js");
+
+// With options
+CloudPage.AppendBundle(new CloudBundle
+{
+    Source        = "js/analytics.js",
+    MinOnRelease  = true,   // js/analytics.js -> js/analytics.min.js outside Development
+    AppendVersion = true,   // adds a content-based version
+    Defer         = true,
+    Async         = false,
+    UseMapping    = true,   // resolve through the static asset manifest
+    AddOns        = null,   // verbatim attributes
+});
+
+// At a specific position — critical CSS first
+CloudPage.InsertBundle(0, new CloudBundle { Source = "css/critical.css" });</code></pre>
+</section>
+
+<section class="section">
+    <h2>Bundles on this page</h2>
+
+    <p>
+        The application-wide bundle from <code>PageDefaults</code> is rendered first, then the
+        two added by this page. View source to see the emitted tags.
+    </p>
+
+    <div class="result-grid">
+        @foreach (CloudBundle bundle in CloudPage.Bundles)
+        {
+            <ResultRow Label="@BundleKind(bundle.Source)">
+                <code>@bundle.Source</code>
+            </ResultRow>
+        }
+    </div>
+
+    <div class="callout">
+        <p>
+            Ordering is deliberate: application defaults come before per-page bundles, so a page
+            can override a site-wide rule without touching configuration.
+        </p>
+    </div>
+</section>
+
+<section class="section">
+    <h2>Options</h2>
+
+    <div class="table-scroll">
+        <table class="api-table">
+            <thead>
+                <tr>
+                    <th>Property</th>
+                    <th>Default</th>
+                    <th>Description</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr><td><code>Source</code></td><td>required</td><td>Relative path, or an absolute <code>http(s)</code> URL.</td></tr>
+                <tr><td><code>MinOnRelease</code></td><td><code>true</code></td><td>Inserts <code>.min.</code> before the extension outside Development.</td></tr>
+                <tr><td><code>AppendVersion</code></td><td><code>true</code></td><td>Adds a content-based version for cache busting.</td></tr>
+                <tr><td><code>UseMapping</code></td><td><code>true</code></td><td>Resolves through the static asset manifest; falls back to <code>IFileVersionProvider</code>.</td></tr>
+                <tr><td><code>Defer</code></td><td><code>true</code></td><td>Adds <code>defer</code> to <code>&lt;script&gt;</code> tags.</td></tr>
+                <tr><td><code>Async</code></td><td><code>false</code></td><td>Adds <code>async</code> to <code>&lt;script&gt;</code> tags.</td></tr>
+                <tr><td><code>AddOns</code></td><td><code>null</code></td><td>Attribute string appended verbatim, for integrity or crossorigin.</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <p>
+        Only <code>.css</code> and <code>.js</code> sources render. Anything else is ignored,
+        so an unsupported path cannot emit a broken tag.
+    </p>
+</section>
+
+<section class="section">
+    <h2>MVC views</h2>
+
+    <p>
+        Add <code>@@using AngryMonkey.CloudBlazor.Web</code> to <code>_ViewImports.cshtml</code>,
+        then append bundles from a view or layout.
+    </p>
+
+    <pre><code>public class HomeController(CloudPage cloudPage) : CloudController(cloudPage)
+{
+    public IActionResult Index()
+    {
+        CloudPage("Home");
+        return View();
+    }
+}</code></pre>
+
+    <pre><code>@@Html.Bundle("css/site.css")</code></pre>
+</section>
+
+@code {
+    protected override void OnInitialized() =>
+        CloudPage
+            .SetTitle("Asset Bundles")
+            .SetDescription("Per-page CSS and JavaScript bundles with minification and cache-busting version stamping.")
+            .AppendBundle(new CloudBundle
+            {
+                Source = "css/page-bundle.css",
+                MinOnRelease = false,
+                AppendVersion = false
+            })
+            .AppendBundle(new CloudBundle
+            {
+                Source = "js/page-bundle.js",
+                MinOnRelease = false,
+                AppendVersion = false,
+                Defer = true
+            });
+
+    private static string BundleKind(string source) =>
+        source.EndsWith(".css", StringComparison.OrdinalIgnoreCase) ? "Stylesheet" : "Script";
+}

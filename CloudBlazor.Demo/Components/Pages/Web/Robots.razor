@@ -1,0 +1,110 @@
+@page "/web/robots"
+@inject CloudPage CloudPage
+
+<PageIntro Package="AngryMonkey.CloudBlazor.Web" Title="Robots Control">
+    Indexing and link-following are controlled per page, and preview hosts are protected
+    without any per-page configuration.
+</PageIntro>
+
+<section class="section">
+    <h2>Usage</h2>
+
+    <pre><code>CloudPage.SetIndexPage(false);   // noindex
+CloudPage.SetFollowPage(false);  // nofollow</code></pre>
+
+    <p>
+        This page sets <code>noindex</code> and leaves following enabled, so a crawler skips the
+        page but still follows its links.
+    </p>
+
+    <div class="result-grid">
+        <ResultRow Label="IndexPage">
+            <code>@Describe(CloudPage.IndexPage)</code>
+        </ResultRow>
+        <ResultRow Label="FollowPage">
+            <code>@Describe(CloudPage.FollowPage)</code>
+        </ResultRow>
+        <ResultRow Label="Rendered tag">
+            @if (CloudPage.RobotsResult() is string robots)
+            {
+                <code>&lt;meta name="robots" content="@robots"&gt;</code>
+            }
+            else
+            {
+                <span class="badge">no tag emitted</span>
+            }
+        </ResultRow>
+    </div>
+</section>
+
+<section class="section">
+    <h2>Output matrix</h2>
+
+    <p>
+        Nothing is emitted when both are allowed — the absence of a robots tag already means
+        index and follow, so an explicit tag would be noise.
+    </p>
+
+    <div class="table-scroll">
+        <table class="api-table">
+            <thead>
+                <tr>
+                    <th><code>IndexPage</code></th>
+                    <th><code>FollowPage</code></th>
+                    <th>Output</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr><td><code>true</code></td><td><code>true</code></td><td><em>no tag</em></td></tr>
+                <tr><td><code>false</code></td><td><code>true</code></td><td><code>noindex</code></td></tr>
+                <tr><td><code>true</code></td><td><code>false</code></td><td><code>nofollow</code></td></tr>
+                <tr><td><code>false</code></td><td><code>false</code></td><td><code>noindex, nofollow</code></td></tr>
+            </tbody>
+        </table>
+    </div>
+</section>
+
+<section class="section">
+    <h2>Preview host protection</h2>
+
+    <p>
+        A request whose host matches a known non-production suffix is served
+        <code>noindex, nofollow</code> regardless of per-page settings, so a staging deployment
+        cannot be indexed by accident. Blazor and MVC share the same check.
+    </p>
+
+    <div class="result-grid">
+        <ResultRow Label="Suffixes">
+            <code>@string.Join(", ", CloudWebConfig.NonProductionHostSuffixes)</code>
+        </ResultRow>
+        <ResultRow Label="This host">
+            @if (CloudWebConfig.IsNonProductionHost(_host))
+            {
+                <span class="badge badge-off">non-production</span>
+            }
+            else
+            {
+                <span class="badge badge-on">production</span>
+            }
+            <code>@_host</code>
+        </ResultRow>
+    </div>
+</section>
+
+@code {
+    [CascadingParameter] private HttpContext? HttpContext { get; set; }
+
+    private string _host = "unknown";
+
+    protected override void OnInitialized()
+    {
+        CloudPage
+            .SetTitle("Robots Control")
+            .SetDescription("Per-page noindex and nofollow directives, plus automatic protection for preview hosts.")
+            .SetIndexPage(false);
+
+        _host = HttpContext?.Request.Host.Host ?? "unknown";
+    }
+
+    private static string Describe(bool? value) => value?.ToString().ToLowerInvariant() ?? "not set";
+}

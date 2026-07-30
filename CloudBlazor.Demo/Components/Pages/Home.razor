@@ -1,13 +1,122 @@
-﻿@page "/"
+@page "/"
+@inject CloudPage CloudPage
 
-<PageTitle>Home</PageTitle>
-
-<h1>Hello, world!</h1>
-
-Welcome to your new app.
-
-@for (int i = 0; i < 100; i++)
-{
-    <div> dksan dasd sa,d ,asd sad sa</div>
-    <br />
+@code {
+    protected override void OnInitialized() =>
+        CloudPage
+            .SetTitle("Overview")
+            .SetDescription("One demo for the whole CloudBlazor ecosystem: shared browser behaviors, website infrastructure, and application navigation.");
 }
+
+<PageIntro Package="AngryMonkey.CloudBlazor" Title="CloudBlazor">
+    The foundation of the Angry Monkey Cloud Blazor ecosystem. One core library plus three
+    focused packages that build on it, all running together in this single demo.
+</PageIntro>
+
+<div class="card-grid">
+    <div class="card">
+        <span class="card-tag">AngryMonkey.CloudBlazor</span>
+        <h3>Browser Behaviors</h3>
+        <p>
+            Reusable behaviors that work in every hosting model through one delegated document
+            handler — static SSR, interactive Blazor, WebAssembly, and Blazor Hybrid.
+        </p>
+        <NavLink class="btn" href="behaviors/initialization">How it initializes →</NavLink>
+    </div>
+
+    <div class="card">
+        <span class="card-tag">AngryMonkey.CloudBlazor.Web</span>
+        <h3>Website Infrastructure</h3>
+        <p>
+            Owns the document head: title and meta tags, favicon and theme colour, robots
+            directives, asset bundles, and crawler detection.
+        </p>
+        <NavLink class="btn" href="web/metadata">Explore metadata →</NavLink>
+    </div>
+
+    <div class="card">
+        <span class="card-tag">AngryMonkey.CloudBlazor.App</span>
+        <h3>Application Framework</h3>
+        <p>
+            A navigation abstraction with page hierarchy tracking, popup-aware back
+            navigation, and platform-appropriate external links.
+        </p>
+        <NavLink class="btn" href="app/navigation">Try navigation →</NavLink>
+    </div>
+
+    <div class="card">
+        <span class="card-tag">AngryMonkey.CloudBlazor.App.Maui</span>
+        <h3>MAUI Blazor Hybrid</h3>
+        <p>
+            The same navigation contract backed by the platform launcher, so <code>tel:</code>,
+            <code>mailto:</code> and web links leave the <code>BlazorWebView</code>.
+        </p>
+        <span class="card-tag">Requires a MAUI host</span>
+    </div>
+</div>
+
+<section class="section">
+    <h2>Package layout</h2>
+
+    <p>Each package depends only on the one above it, so an application takes exactly what it needs.</p>
+
+    <pre><code>AngryMonkey.CloudBlazor
+├── AngryMonkey.CloudBlazor.Web
+└── AngryMonkey.CloudBlazor.App
+    └── AngryMonkey.CloudBlazor.App.Maui</code></pre>
+
+    <div class="table-scroll">
+        <table class="api-table">
+            <thead>
+                <tr>
+                    <th>Package</th>
+                    <th>Install</th>
+                    <th>Use it for</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><code>AngryMonkey.CloudBlazor</code></td>
+                    <td><code>dotnet add package AngryMonkey.CloudBlazor</code></td>
+                    <td>Shared components and browser behaviors.</td>
+                </tr>
+                <tr>
+                    <td><code>AngryMonkey.CloudBlazor.Web</code></td>
+                    <td><code>dotnet add package AngryMonkey.CloudBlazor.Web</code></td>
+                    <td>Websites: Blazor Web Apps, MVC, Razor Pages.</td>
+                </tr>
+                <tr>
+                    <td><code>AngryMonkey.CloudBlazor.App</code></td>
+                    <td><code>dotnet add package AngryMonkey.CloudBlazor.App</code></td>
+                    <td>Blazor WebAssembly and Blazor Hybrid clients.</td>
+                </tr>
+                <tr>
+                    <td><code>AngryMonkey.CloudBlazor.App.Maui</code></td>
+                    <td><code>dotnet add package AngryMonkey.CloudBlazor.App.Maui</code></td>
+                    <td>.NET MAUI Blazor Hybrid hosts.</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</section>
+
+<section class="section">
+    <h2>What this demo registers</h2>
+
+    <p>All three web-capable packages are wired up in one <code>Program.cs</code>.</p>
+
+    <pre><code>builder.Services.AddRazorComponents().AddInteractiveServerComponents();
+
+builder.Services.AddCloudWeb(config =>
+{
+    config.TitleSuffix = " · CloudBlazor";
+
+    config.PageDefaults
+        .SetTitle("CloudBlazor")
+        .SetFavicon("/favicon.png")
+        .SetThemeColor("#4f8ef7")
+        .AppendBundle(new CloudBundle { Source = "css/app.css", MinOnRelease = false });
+});
+
+builder.Services.AddCloudApp();</code></pre>
+</section>

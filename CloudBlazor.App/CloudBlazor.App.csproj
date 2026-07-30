@@ -1,0 +1,32 @@
+<Project Sdk="Microsoft.NET.Sdk.Razor">
+
+	<PropertyGroup>
+		<AssemblyName>AngryMonkey.CloudBlazor.App</AssemblyName>
+		<RootNamespace>AngryMonkey.CloudBlazor.App</RootNamespace>
+		<PackageId>AngryMonkey.CloudBlazor.App</PackageId>
+
+		<Product>Cloud Blazor App</Product>
+		<Description>Application framework for Blazor WebAssembly and Blazor Hybrid clients: navigation abstractions, page hierarchy tracking, and a browser navigation service.</Description>
+		<PackageTags>blazor;webassembly;navigation;spa;maui;angrymonkey</PackageTags>
+
+		<Version>1.0.0</Version>
+		<AssemblyVersion>$(PackageVersion)</AssemblyVersion>
+		<FileVersion>$(PackageVersion)</FileVersion>
+
+		<IsPackable>true</IsPackable>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<SupportedPlatform Include="browser" />
+	</ItemGroup>
+
+	<!--
+		Razor SDK rather than the plain library SDK: this is a Razor Class Library, so
+		the static web assets of CloudBlazor (its JS initializer included) flow through
+		to the consuming application instead of stopping here.
+	-->
+	<ItemGroup>
+		<ProjectReference Include="..\CloudBlazor\CloudBlazor.csproj" />
+	</ItemGroup>
+
+</Project>

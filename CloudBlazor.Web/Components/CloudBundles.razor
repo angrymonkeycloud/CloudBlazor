@@ -1,0 +1,26 @@
+@namespace AngryMonkey.CloudBlazor.Web
+
+@*
+    Renders the page's feature dependencies and asset bundles, in that order:
+    a CDN dependency has to load before the bundles that use it.
+*@
+
+@if (CloudPage.Features.Contains(CloudPageFeatures.JQuery))
+{
+    <script suppress-error="BL9992" src="https://code.jquery.com/jquery-3.6.4.min.js" integrity="sha256-oP6HI9z1XaZNBrJURtCoUT5SUnxFr8s3BzRl+cbzUq8=" crossorigin="anonymous"></script>
+}
+
+@if (CloudPage.AddLegacyExportsCreation ?? false)
+{
+    <script suppress-error="BL9992">var exports = {};</script>
+}
+
+@foreach (CloudBundle bundle in CloudPage.Bundles)
+{
+    <CloudBundleTag Bundle="bundle" />
+}
+
+@code {
+    /// <summary>Page whose features and bundles are rendered.</summary>
+    [Parameter, EditorRequired] public required CloudPage CloudPage { get; set; }
+}

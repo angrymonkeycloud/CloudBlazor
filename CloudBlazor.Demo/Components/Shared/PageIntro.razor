@@ -1,0 +1,20 @@
+@*
+    Shared page header: which package the page documents, its title, and a summary.
+*@
+
+<div class="page-header">
+    <span class="eyebrow">@Package</span>
+    <h1>@Title</h1>
+    <p class="lead">@ChildContent</p>
+</div>
+
+@code {
+    /// <summary>NuGet package the page demonstrates.</summary>
+    [Parameter, EditorRequired] public required string Package { get; set; }
+
+    /// <summary>Page heading.</summary>
+    [Parameter, EditorRequired] public required string Title { get; set; }
+
+    /// <summary>Summary shown under the heading.</summary>
+    [Parameter, EditorRequired] public required RenderFragment ChildContent { get; set; }
+}

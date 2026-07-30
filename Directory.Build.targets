@@ -1,0 +1,43 @@
+<Project>
+
+	<!--
+		Imported after each project file, so IsPackable is known here. Anything that
+		keys off it has to live in this file rather than Directory.Build.props.
+	-->
+
+	<!--
+		Deterministic, source-linked builds for the packable libraries so consumers can
+		step into the source from a symbol server.
+	-->
+	<PropertyGroup Condition="'$(IsPackable)' == 'true'">
+		<GenerateDocumentationFile>true</GenerateDocumentationFile>
+		<PublishRepositoryUrl>true</PublishRepositoryUrl>
+		<EmbedUntrackedSources>true</EmbedUntrackedSources>
+		<IncludeSymbols>true</IncludeSymbols>
+		<SymbolPackageFormat>snupkg</SymbolPackageFormat>
+		<PackageIcon>amc-logo.png</PackageIcon>
+		<PackageReadmeFile>README.md</PackageReadmeFile>
+	</PropertyGroup>
+
+	<!--
+		PackageIcon and PackageReadmeFile only name a file — the file still has to be
+		packed. Doing it centrally is what keeps a library from shipping a package that
+		fails NU5039 / NU5046, which is exactly how every package here used to break.
+	-->
+	<ItemGroup Condition="'$(IsPackable)' == 'true'">
+		<None Include="$(MSBuildProjectDirectory)\README.md" Pack="true" PackagePath="\" Visible="false" Condition="Exists('$(MSBuildProjectDirectory)\README.md')" />
+		<None Include="$(MSBuildProjectDirectory)\amc-logo.png" Pack="true" PackagePath="\" Visible="false" Condition="Exists('$(MSBuildProjectDirectory)\amc-logo.png')" />
+	</ItemGroup>
+
+	<!--
+		A packable project that forgot its README or icon would otherwise produce a
+		package missing them, which only shows up on nuget.org after publishing.
+	-->
+	<Target Name="ValidateCloudBlazorPackageAssets" BeforeTargets="GenerateNuspec" Condition="'$(IsPackable)' == 'true'">
+		<Error Condition="!Exists('$(MSBuildProjectDirectory)\README.md')"
+			   Text="$(MSBuildProjectName) is packable but has no README.md. Every published package must ship one." />
+		<Error Condition="!Exists('$(MSBuildProjectDirectory)\amc-logo.png')"
+			   Text="$(MSBuildProjectName) is packable but has no amc-logo.png. Every published package must ship the package icon." />
+	</Target>
+
+</Project>

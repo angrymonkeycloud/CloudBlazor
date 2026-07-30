@@ -1,0 +1,24 @@
+<Project Sdk="Microsoft.NET.Sdk.Razor">
+
+	<PropertyGroup>
+		<AssemblyName>AngryMonkey.CloudBlazor.App.Maui</AssemblyName>
+		<RootNamespace>AngryMonkey.CloudBlazor.App</RootNamespace>
+		<PackageId>AngryMonkey.CloudBlazor.App.Maui</PackageId>
+
+		<Product>Cloud Blazor App MAUI</Product>
+		<Description>.NET MAUI Blazor Hybrid integration for CloudBlazor.App: native navigation, hardware back button handling, and external launcher support.</Description>
+		<PackageTags>blazor;maui;hybrid;blazorwebview;navigation;android;ios;angrymonkey</PackageTags>
+
+		<Version>1.0.0</Version>
+		<AssemblyVersion>$(PackageVersion)</AssemblyVersion>
+		<FileVersion>$(PackageVersion)</FileVersion>
+
+		<IsPackable>true</IsPackable>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\CloudBlazor.App\CloudBlazor.App.csproj" />
+		<PackageReference Include="Microsoft.Maui.Controls" Version="10.0.0" />
+	</ItemGroup>
+
+</Project>

@@ -427,3 +427,9 @@ FodyWeavers.xsd
 *.msix
 *.msm
 *.msp
+
+# NuGet packages produced by CloudBlazor.Package / dotnet pack
+NugetPackages/
+
+# Test results and coverage
+TestResults/

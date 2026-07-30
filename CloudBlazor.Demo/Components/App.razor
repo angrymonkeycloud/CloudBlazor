@@ -1,21 +1,29 @@
-﻿<!DOCTYPE html>
-<html lang="en">
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
 
 <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    @*
+        <base> has to precede every relative URL in the document. CloudBlazor.Web emits
+        relative bundle paths, so placing the placeholder above this element would make
+        them resolve against the current path and 404 on any nested route.
+    *@
     <base href="/" />
-    <ResourcePreloader />
-    <link rel="stylesheet" href="@Assets["lib/bootstrap/dist/css/bootstrap.min.css"]" />
-    <link rel="stylesheet" href="@Assets["app.css"]" />
-    <link rel="stylesheet" href="@Assets["CloudBlazor.Demo.styles.css"]" />
+
+    @*
+        Marks where CloudBlazor.Web renders the managed head: title, meta tags, robots
+        directives, asset bundles and the CloudBlazor script.
+    *@
+    <CloudHeadPlaceholder />
+
     <ImportMap />
-    <link rel="icon" type="image/png" href="favicon.png" />
-    <HeadOutlet />
 </head>
 
 <body>
     <Routes />
+    <script src="@Assets["js/theme.js"]"></script>
+    <script src="@Assets["js/diagnostics.js"]"></script>
     <script src="@Assets["_framework/blazor.web.js"]"></script>
 </body>
 

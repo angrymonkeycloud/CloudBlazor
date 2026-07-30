@@ -1,0 +1,16 @@
+@namespace AngryMonkey.CloudBlazor.Web
+@using Microsoft.AspNetCore.Mvc.ViewFeatures
+@using Microsoft.Extensions.Options
+
+@inject IFileVersionProvider fileVersionProvider
+@inject IOptionsSnapshot<CloudWebConfig> cloudWeb
+
+@*
+    Renders a single CloudBundle as a <link> or <script> tag.
+    Used by CloudBundles; applications configure CloudBundle instead.
+*@
+
+@if (Result is string markup)
+{
+    @((MarkupString)markup)
+}

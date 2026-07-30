@@ -1,0 +1,33 @@
+<Project Sdk="Microsoft.NET.Sdk.Razor">
+
+	<PropertyGroup>
+		<AssemblyName>AngryMonkey.CloudBlazor.Web</AssemblyName>
+		<RootNamespace>AngryMonkey.CloudBlazor.Web</RootNamespace>
+		<PackageId>AngryMonkey.CloudBlazor.Web</PackageId>
+
+		<Product>Cloud Blazor Web</Product>
+		<Description>Server-side website infrastructure for Blazor and MVC applications: page head metadata, SEO and robots directives, asset bundles, and crawler detection.</Description>
+		<PackageTags>blazor;aspnetcore;mvc;seo;metadata;bundles;head;angrymonkey</PackageTags>
+
+		<Version>1.0.0</Version>
+		<AssemblyVersion>$(PackageVersion)</AssemblyVersion>
+		<FileVersion>$(PackageVersion)</FileVersion>
+
+		<IsPackable>true</IsPackable>
+	</PropertyGroup>
+
+	<!--
+		The shared framework covers everything this library binds against (MVC view
+		features, HTTP abstractions, Razor components and sections). Referencing it
+		as a framework reference instead of individual packages keeps Roslyn,
+		Newtonsoft and the WebAssembly debug host out of the NuGet package.
+	-->
+	<ItemGroup>
+		<FrameworkReference Include="Microsoft.AspNetCore.App" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\CloudBlazor\CloudBlazor.csproj" />
+	</ItemGroup>
+
+</Project>
