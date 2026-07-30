@@ -13,4 +13,6 @@
   <Folder Name="/Solution Folder/">
     <File Path="README.md" />
   </Folder>
+  <Project Path="CloudBlazor.Demo/CloudBlazor.Demo.csproj" Id="c8b6801a-2580-4657-becc-c1f77a79e29e" />
+  <Project Path="CloudBlazor/CloudBlazor.csproj" Id="fdf9713f-6b7f-4da8-aabb-975f46f8c7bf" />
 </Solution>

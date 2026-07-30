@@ -1,0 +1,27 @@
+﻿@inherits LayoutComponentBase
+
+<div class="site">
+    <header class="site-header">
+        <div class="header-content">
+            <a href="/" class="brand" cloud-home-link aria-label="CloudBlazor home">
+                <span class="brand-icon">CB</span>
+                <span>CloudBlazor</span>
+            </a>
+
+            <nav aria-label="Main navigation">
+                <NavLink href="/"
+                         Match="NavLinkMatch.All">
+                    Home
+                </NavLink>
+
+                <NavLink class="nav-link" href="weather">
+                    <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Weather
+                </NavLink>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        @Body
+    </main>
+</div>
