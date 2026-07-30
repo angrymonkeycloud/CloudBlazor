@@ -1,0 +1,47 @@
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;background:#0f0f17;color:#d4d4e8;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;font-size:15px;line-height:1.65;-webkit-font-smoothing:antialiased}
+a{color:#4f8ef7;text-decoration:none}
+a:hover{text-decoration:underline}
+.layout{display:flex;min-height:100vh}
+.sidebar{width:240px;background:#16161f;border-right:1px solid #2a2a3a;display:flex;flex-direction:column;flex-shrink:0;position:sticky;top:0;height:100vh;overflow-y:auto}
+.sidebar-header{padding:24px 20px 16px;border-bottom:1px solid #2a2a3a;display:flex;flex-direction:column;gap:4px}
+.sidebar-title{font-size:16px;font-weight:700;color:#4f8ef7;letter-spacing:.02em}
+.sidebar-version{font-size:11px;color:#7878a0;font-family:"Cascadia Code","Fira Code",Consolas,monospace}
+.nav{padding:16px 0;display:flex;flex-direction:column;gap:24px}
+.nav-group{display:flex;flex-direction:column;gap:2px;padding:0 12px}
+.nav-label{font-size:10px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:#7878a0;padding:0 8px 6px}
+.nav-link{display:block;padding:7px 10px;border-radius:6px;color:#d4d4e8;font-size:14px;transition:background .15s,color .15s}
+.nav-link:hover{background:#1e1e2a;color:#4f8ef7;text-decoration:none}
+.nav-link.active{background:#1e1e2a;color:#4f8ef7;font-weight:500}
+.content{flex:1;min-width:0;overflow-y:auto}
+.content-inner{max-width:860px;padding:48px 48px 80px}
+.page-header{margin-bottom:40px;padding-bottom:28px;border-bottom:1px solid #2a2a3a}
+.page-header h1{font-size:28px;font-weight:700;color:#fff;margin-bottom:10px}
+.lead{font-size:16px;color:#7878a0;line-height:1.7}
+.lead code{font-size:14px;color:#d4d4e8}
+.section{margin-bottom:40px}
+.section h2{font-size:18px;font-weight:600;color:#fff;margin-bottom:16px;padding-bottom:8px;border-bottom:1px solid #2a2a3a}
+.section p{color:#d4d4e8;margin-bottom:14px}
+.section ol{padding-left:20px;color:#d4d4e8}
+.section ol li{margin-bottom:6px}
+pre{background:#16161f;border:1px solid #2a2a3a;border-radius:6px;padding:18px 20px;overflow-x:auto;margin-bottom:20px}
+pre code{font-family:"Cascadia Code","Fira Code",Consolas,monospace;font-size:13px;color:#d4d4e8;background:none;padding:0;border-radius:0}
+code{font-family:"Cascadia Code","Fira Code",Consolas,monospace;font-size:13px;background:#1e1e2a;color:#4f8ef7;padding:2px 6px;border-radius:4px}
+.card-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:16px;margin-bottom:40px}
+.card{background:#16161f;border:1px solid #2a2a3a;border-radius:6px;padding:22px;display:flex;flex-direction:column;gap:10px}
+.card h3{font-size:15px;font-weight:600;color:#fff}
+.card p{font-size:13px;color:#7878a0;flex:1}
+.btn{display:inline-block;padding:7px 14px;background:#4f8ef7;color:#fff;border-radius:6px;font-size:13px;font-weight:500;transition:background .15s;align-self:flex-start;text-decoration:none}
+.btn:hover{background:#3a6fd4;text-decoration:none}
+.api-table{width:100%;border-collapse:collapse;font-size:14px;margin-bottom:20px}
+.api-table thead{background:#1e1e2a}
+.api-table thead th{padding:10px 14px;text-align:left;font-weight:600;color:#fff;border-bottom:1px solid #2a2a3a}
+.api-table tbody tr{border-bottom:1px solid #2a2a3a}
+.api-table tbody tr:last-child{border-bottom:none}
+.api-table tbody tr:hover{background:#1e1e2a}
+.api-table tbody td{padding:10px 14px;color:#d4d4e8;vertical-align:top}
+.result-grid{border:1px solid #2a2a3a;border-radius:6px;overflow:hidden;margin-bottom:20px}
+.result-row{display:flex;align-items:baseline;gap:16px;padding:10px 16px;border-bottom:1px solid #2a2a3a}
+.result-row:last-child{border-bottom:none}
+.result-row:nth-child(even){background:#1e1e2a}
+.result-label{flex-shrink:0;width:100px;font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:#7878a0}

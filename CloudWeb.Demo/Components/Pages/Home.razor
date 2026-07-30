@@ -1,0 +1,63 @@
+@page "/"
+@inject CloudPage CloudPage
+
+@code {
+    protected override void OnInitialized()
+    {
+        CloudPage.SetTitle("Overview");
+    }
+}
+
+<div class="page-header">
+    <h1>CloudWeb</h1>
+    <p class="lead">An ASP.NET Core library that manages page <code>&lt;head&gt;</code> content and static asset bundles for Blazor and MVC applications.</p>
+</div>
+
+<div class="card-grid">
+    <div class="card">
+        <h3>Page Metadata</h3>
+        <p>Control title, description, keywords, and favicon per page using a fluent API. Apply global defaults through configuration.</p>
+        <a class="btn" href="metadata">View Demo</a>
+    </div>
+    <div class="card">
+        <h3>Asset Bundles</h3>
+        <p>Append CSS and JavaScript bundles per page or globally. Automatic minification suffix insertion and cache-busting version query strings.</p>
+        <a class="btn" href="bundles">View Demo</a>
+    </div>
+    <div class="card">
+        <h3>CDN Features</h3>
+        <p>Inject CDN dependencies on demand by adding a feature flag. Supported: Azure Maps, TinyMCE, and jQuery.</p>
+        <a class="btn" href="features">View Demo</a>
+    </div>
+    <div class="card">
+        <h3>Robots Control</h3>
+        <p>Set index and follow directives per page. Staging environments on <code>azurewebsites.net</code> are automatically marked <code>noindex, nofollow</code>.</p>
+        <a class="btn" href="robots">View Demo</a>
+    </div>
+    <div class="card">
+        <h3>Crawler Detection</h3>
+        <p>Detect search engine crawlers from an extensive user-agent list. Adapt responses for bots without additional middleware.</p>
+        <a class="btn" href="crawler">View Demo</a>
+    </div>
+</div>
+
+<section class="section">
+    <h2>Installation</h2>
+    <pre><code>dotnet add package AngryMonkey.CloudWeb</code></pre>
+
+    <h2>Registration</h2>
+    <pre><code>builder.Services.AddCloudWeb(config =>
+{
+    config.TitleSuffix = " - My App";
+
+    config.PageDefaults
+        .SetFavicon("/favicon.svg")
+        .SetDescription("Default page description.")
+        .SetKeywords("keyword1, keyword2");
+});</code></pre>
+
+    <h2>Blazor Head</h2>
+    <p>Place <code>&lt;CloudHeadContent /&gt;</code> inside your <code>App.razor</code> head section to render all managed head tags.</p>
+    <pre><code>&lt;SectionPlaceholder SectionName="CloudWeb" /&gt;</code></pre>
+    <pre><code>&lt;CloudHeadContent /&gt;</code></pre>
+</section>

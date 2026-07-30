@@ -1,0 +1,85 @@
+@page "/bundles"
+@inject CloudPage CloudPage
+
+@code {
+    protected override void OnInitialized()
+    {
+        CloudPage
+            .SetTitle("Asset Bundles")
+            .SetDescription("Demonstrating per-page CSS and JavaScript bundle management with automatic minification and version stamping.")
+            .AppendBundle(new CloudBundle { Source = "~/css/page-specific.css", MinOnRelease = false, AppendVersion = false })
+            .AppendBundle(new CloudBundle { Source = "~/js/page-specific.js", MinOnRelease = false, AppendVersion = false, Defer = true });
+    }
+}
+
+<div class="page-header">
+    <h1>Asset Bundles</h1>
+    <p class="lead">Append CSS and JavaScript files to any page through <code>CloudPage</code>. Global bundles are merged with per-page bundles at render time.</p>
+</div>
+
+<section class="section">
+    <h2>Appending Bundles</h2>
+    <pre><code>CloudPage.AppendBundle("~/css/theme.css");
+CloudPage.AppendBundle("~/js/app.js");
+
+// Or with full options:
+CloudPage.AppendBundle(new CloudBundle
+{
+    Source      = "~/js/analytics.js",
+    MinOnRelease = true,   // inserts .min. before the extension in Release
+    AppendVersion = true,  // appends ?v= cache-busting query string
+    Defer       = true,    // adds defer attribute
+    Async       = false,
+    UseMapping  = true,    // resolve path through the asset manifest
+});</code></pre>
+</section>
+
+<section class="section">
+    <h2>Bundle Options</h2>
+    <table class="api-table">
+        <thead>
+            <tr>
+                <th>Option</th>
+                <th>Default</th>
+                <th>Description</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr><td><code>Source</code></td><td>required</td><td>Relative or absolute URL of the asset.</td></tr>
+            <tr><td><code>MinOnRelease</code></td><td><code>true</code></td><td>Inserts <code>.min.</code> before the file extension in non-Development environments.</td></tr>
+            <tr><td><code>AppendVersion</code></td><td><code>true</code></td><td>Appends a content-based <code>?v=</code> query string for cache busting.</td></tr>
+            <tr><td><code>UseMapping</code></td><td><code>true</code></td><td>Resolves the path through the static asset manifest; falls back to <code>IFileVersionProvider</code> when <code>false</code>.</td></tr>
+            <tr><td><code>Defer</code></td><td><code>true</code></td><td>Adds the <code>defer</code> attribute to script tags.</td></tr>
+            <tr><td><code>Async</code></td><td><code>false</code></td><td>Adds the <code>async</code> attribute to script tags.</td></tr>
+            <tr><td><code>AddOns</code></td><td><code>null</code></td><td>Freeform attribute string appended verbatim to the rendered tag.</td></tr>
+        </tbody>
+    </table>
+</section>
+
+<section class="section">
+    <h2>Global Bundles</h2>
+    <p>Bundles added to <code>config.PageDefaults</code> are injected on every page before per-page bundles.</p>
+    <pre><code>builder.Services.AddCloudWeb(config =>
+{
+    config.PageDefaults
+        .AppendBundle("~/css/site.css")
+        .AppendBundle("~/js/site.js");
+});</code></pre>
+</section>
+
+<section class="section">
+    <h2>MVC / Razor Views</h2>
+    <p>In MVC, inherit from <code>CloudController</code> and use the <code>Bundle</code> HTML helper in views.</p>
+    <pre><code>// Controller
+public class HomeController(CloudPage cloudPage) : CloudController(cloudPage)
+{
+    public IActionResult Index()
+    {
+        CloudPage("Home Page");
+        return View();
+    }
+}
+
+// View (_Layout.cshtml)
+@@Html.Bundle("~/css/site.css")</code></pre>
+</section>

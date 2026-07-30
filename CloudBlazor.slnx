@@ -1,0 +1,16 @@
+<Solution>
+  <Folder Name="/CloudApp/">
+    <Project Path="CloudApp.Maui/CloudApp.Maui.csproj" />
+    <Project Path="CloudApp.Packing/CloudApp.Packing.csproj" />
+    <Project Path="CloudApp/CloudApp.csproj" />
+  </Folder>
+  <Folder Name="/CloudWeb/">
+    <Project Path="CloudWeb.Demo/CloudWeb.Demo.csproj" />
+    <Project Path="CloudWeb.Nuget/CloudWeb.Nuget.csproj" />
+    <Project Path="CloudWeb.Tests/CloudWeb.Tests.csproj" />
+    <Project Path="CloudWeb/CloudWeb.csproj" />
+  </Folder>
+  <Folder Name="/Solution Folder/">
+    <File Path="README.md" />
+  </Folder>
+</Solution>

@@ -1,0 +1,56 @@
+﻿@namespace AngryMonkey.CloudWeb
+@using Microsoft.Extensions.Options
+
+@inject IOptionsSnapshot<CloudWebConfig> cloudWeb
+@{
+    string? title = CloudPage.TitleResult(cloudWeb.Value);
+    string? keywords = CloudPage.KeywordsResult();
+    string? description = CloudPage.DescriptionResult();
+    string? robots = CloudPage.RobotsResult();
+    string? favicon = CloudPage.FaviconResult();
+    string? faviconType = CloudPage.FaviconTypeResult();
+    string? themeColor = CloudPage.ThemeColorResult();
+    string? manifest = CloudPage.ManifestResult();
+}
+
+@if (!string.IsNullOrEmpty(title))
+{
+    <title>@title</title>
+}
+
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+@if (!string.IsNullOrEmpty(favicon))
+{
+    <link rel="icon" href="@favicon" type="@faviconType" />
+}
+
+@if (!string.IsNullOrEmpty(themeColor))
+{
+    <meta name="theme-color" content="@themeColor" />
+}
+
+@if (!string.IsNullOrEmpty(manifest))
+{
+    <link rel="manifest" href="@manifest" />
+}
+
+@if (!string.IsNullOrEmpty(keywords))
+{
+    <meta name="keywords" content="@keywords" />
+}
+
+@if (!string.IsNullOrEmpty(description))
+{
+    <meta name="description" content="@description" />
+}
+
+@if (!string.IsNullOrEmpty(robots))
+{
+    <meta name="robots" content="@robots" />
+}
+
+@code {
+    [Parameter] public required CloudPage CloudPage { get; set; }
+}

@@ -1,0 +1,81 @@
+@page "/features"
+@inject CloudPage CloudPage
+
+@code {
+    protected override void OnInitialized()
+    {
+        CloudPage
+            .SetTitle("CDN Features")
+            .SetDescription("Demonstrating on-demand CDN dependency injection using the CloudPageFeatures enum.");
+    }
+}
+
+<div class="page-header">
+    <h1>CDN Features</h1>
+    <p class="lead">Add a feature flag to <code>CloudPage</code> and the corresponding CDN dependency is injected automatically into the page head.</p>
+</div>
+
+<section class="section">
+    <h2>Usage</h2>
+    <pre><code>CloudPage.AddFeature(CloudPageFeatures.Maps);
+CloudPage.AddFeature(CloudPageFeatures.JQuery);
+CloudPage.AddFeature(CloudPageFeatures.TextEditor);
+
+// Multiple at once:
+CloudPage.AddFeatures(CloudPageFeatures.Maps, CloudPageFeatures.JQuery);</code></pre>
+</section>
+
+<section class="section">
+    <h2>Available Features</h2>
+    <table class="api-table">
+        <thead>
+            <tr>
+                <th>Feature</th>
+                <th>CDN Dependency Injected</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><code>CloudPageFeatures.Maps</code></td>
+                <td>Azure Maps SDK — <code>atlas.min.css</code> and <code>atlas.min.js</code></td>
+            </tr>
+            <tr>
+                <td><code>CloudPageFeatures.TextEditor</code></td>
+                <td>TinyMCE 5 — <code>tinymce.min.js</code></td>
+            </tr>
+            <tr>
+                <td><code>CloudPageFeatures.JQuery</code></td>
+                <td>jQuery 3.6.4 — <code>jquery-3.6.4.min.js</code></td>
+            </tr>
+        </tbody>
+    </table>
+</section>
+
+<section class="section">
+    <h2>Legacy Exports Shim</h2>
+    <p>Some older CommonJS modules expect a global <code>exports</code> object. Enable the compatibility shim with:</p>
+    <pre><code>CloudPage.SetAddLegacyExportsCreation(true);</code></pre>
+    <p>This injects <code>&lt;script&gt;var exports = {};&lt;/script&gt;</code> before all bundles on that page.</p>
+</section>
+
+<section class="section">
+    <h2>Adding a New Feature</h2>
+    <ol>
+        <li>Add an entry to <code>CloudPageFeatures</code> in <code>CloudWeb/Enums/CloudPageFeatures.cs</code>.</li>
+        <li>Add the corresponding conditional block in <code>CloudWeb/CloudBundles.razor</code>.</li>
+    </ol>
+    <pre><code>// CloudPageFeatures.cs
+public enum CloudPageFeatures
+{
+    Maps,
+    TextEditor,
+    JQuery,
+    MyLibrary
+}
+
+// CloudBundles.razor
+@@if (CloudPage.Features.Contains(CloudPageFeatures.MyLibrary))
+{
+    &lt;script src="https://cdn.example.com/my-library.min.js" defer&gt;&lt;/script&gt;
+}</code></pre>
+</section>

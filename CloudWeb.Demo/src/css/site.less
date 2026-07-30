@@ -1,0 +1,317 @@
+// Variables
+@color-bg:          #0f0f17;
+@color-surface:     #16161f;
+@color-surface-2:   #1e1e2a;
+@color-border:      #2a2a3a;
+@color-text:        #d4d4e8;
+@color-text-muted:  #7878a0;
+@color-accent:      #4f8ef7;
+@color-accent-dark: #3a6fd4;
+@font-sans:         -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+@font-mono:         "Cascadia Code", "Fira Code", Consolas, monospace;
+@sidebar-width:     240px;
+@radius:            6px;
+
+// Reset / base
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html, body {
+    height: 100%;
+    background: @color-bg;
+    color: @color-text;
+    font-family: @font-sans;
+    font-size: 15px;
+    line-height: 1.65;
+    -webkit-font-smoothing: antialiased;
+}
+
+a { color: @color-accent; text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+// Layout
+.layout {
+    display: flex;
+    min-height: 100vh;
+}
+
+// Sidebar
+.sidebar {
+    width: @sidebar-width;
+    background: @color-surface;
+    border-right: 1px solid @color-border;
+    display: flex;
+    flex-direction: column;
+    flex-shrink: 0;
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    overflow-y: auto;
+}
+
+.sidebar-header {
+    padding: 24px 20px 16px;
+    border-bottom: 1px solid @color-border;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.sidebar-title {
+    font-size: 16px;
+    font-weight: 700;
+    color: @color-accent;
+    letter-spacing: 0.02em;
+}
+
+.sidebar-version {
+    font-size: 11px;
+    color: @color-text-muted;
+    font-family: @font-mono;
+}
+
+// Navigation
+.nav {
+    padding: 16px 0;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+.nav-group {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    padding: 0 12px;
+}
+
+.nav-label {
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: @color-text-muted;
+    padding: 0 8px 6px;
+}
+
+.nav-link {
+    display: block;
+    padding: 7px 10px;
+    border-radius: @radius;
+    color: @color-text;
+    font-size: 14px;
+    transition: background 0.15s, color 0.15s;
+
+    &:hover {
+        background: @color-surface-2;
+        color: @color-accent;
+        text-decoration: none;
+    }
+
+    &.active {
+        background: @color-surface-2;
+        color: @color-accent;
+        font-weight: 500;
+    }
+}
+
+// Main content
+.content {
+    flex: 1;
+    min-width: 0;
+    overflow-y: auto;
+}
+
+.content-inner {
+    max-width: 860px;
+    padding: 48px 48px 80px;
+}
+
+// Page header
+.page-header {
+    margin-bottom: 40px;
+    padding-bottom: 28px;
+    border-bottom: 1px solid @color-border;
+
+    h1 {
+        font-size: 28px;
+        font-weight: 700;
+        color: #fff;
+        margin-bottom: 10px;
+    }
+}
+
+.lead {
+    font-size: 16px;
+    color: @color-text-muted;
+    line-height: 1.7;
+
+    code {
+        font-size: 14px;
+        color: @color-text;
+    }
+}
+
+// Section
+.section {
+    margin-bottom: 40px;
+
+    h2 {
+        font-size: 18px;
+        font-weight: 600;
+        color: #fff;
+        margin-bottom: 16px;
+        padding-bottom: 8px;
+        border-bottom: 1px solid @color-border;
+    }
+
+    p {
+        color: @color-text;
+        margin-bottom: 14px;
+    }
+
+    ol {
+        padding-left: 20px;
+        color: @color-text;
+
+        li { margin-bottom: 6px; }
+    }
+}
+
+// Code blocks
+pre {
+    background: @color-surface;
+    border: 1px solid @color-border;
+    border-radius: @radius;
+    padding: 18px 20px;
+    overflow-x: auto;
+    margin-bottom: 20px;
+
+    code {
+        font-family: @font-mono;
+        font-size: 13px;
+        color: @color-text;
+        background: none;
+        padding: 0;
+        border-radius: 0;
+    }
+}
+
+code {
+    font-family: @font-mono;
+    font-size: 13px;
+    background: @color-surface-2;
+    color: @color-accent;
+    padding: 2px 6px;
+    border-radius: 4px;
+}
+
+// Card grid
+.card-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 16px;
+    margin-bottom: 40px;
+}
+
+.card {
+    background: @color-surface;
+    border: 1px solid @color-border;
+    border-radius: @radius;
+    padding: 22px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+
+    h3 {
+        font-size: 15px;
+        font-weight: 600;
+        color: #fff;
+    }
+
+    p {
+        font-size: 13px;
+        color: @color-text-muted;
+        flex: 1;
+    }
+}
+
+// Button
+.btn {
+    display: inline-block;
+    padding: 7px 14px;
+    background: @color-accent;
+    color: #fff;
+    border-radius: @radius;
+    font-size: 13px;
+    font-weight: 500;
+    transition: background 0.15s;
+    align-self: flex-start;
+    text-decoration: none;
+
+    &:hover {
+        background: @color-accent-dark;
+        text-decoration: none;
+    }
+}
+
+// Tables
+.api-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+    margin-bottom: 20px;
+
+    thead {
+        background: @color-surface-2;
+
+        th {
+            padding: 10px 14px;
+            text-align: left;
+            font-weight: 600;
+            color: #fff;
+            border-bottom: 1px solid @color-border;
+        }
+    }
+
+    tbody tr {
+        border-bottom: 1px solid @color-border;
+
+        &:last-child { border-bottom: none; }
+        &:hover { background: @color-surface-2; }
+
+        td {
+            padding: 10px 14px;
+            color: @color-text;
+            vertical-align: top;
+        }
+    }
+}
+
+// Result grid
+.result-grid {
+    border: 1px solid @color-border;
+    border-radius: @radius;
+    overflow: hidden;
+    margin-bottom: 20px;
+}
+
+.result-row {
+    display: flex;
+    align-items: baseline;
+    gap: 16px;
+    padding: 10px 16px;
+    border-bottom: 1px solid @color-border;
+
+    &:last-child { border-bottom: none; }
+    &:nth-child(even) { background: @color-surface-2; }
+}
+
+.result-label {
+    flex-shrink: 0;
+    width: 100px;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: @color-text-muted;
+}

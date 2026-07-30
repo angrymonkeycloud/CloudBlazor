@@ -1,0 +1,66 @@
+@page "/crawler"
+@inject CloudPage CloudPage
+
+@code {
+    protected override void OnInitialized()
+    {
+        CloudPage
+            .SetTitle("Crawler Detection")
+            .SetDescription("Demonstrating built-in search engine crawler detection via user-agent matching.");
+    }
+}
+
+<div class="page-header">
+    <h1>Crawler Detection</h1>
+    <p class="lead"><code>CloudPage</code> detects search engine crawlers on construction by matching the request <code>User-Agent</code> header against an extensive built-in list.</p>
+</div>
+
+<section class="section">
+    <h2>How It Works</h2>
+    <p>When <code>CloudPage</code> is constructed with an <code>IHttpContextAccessor</code>, the incoming <code>User-Agent</code> header is lowercased and checked against <code>CloudWebConfig.CrawlersUserAgents</code>. The <code>IsCrawler</code> property is set to <code>true</code> if any substring matches.</p>
+    <pre><code>// Injected automatically by DI — no manual work required
+@("@inject CloudPage CloudPage")
+
+@if (CloudPage.IsCrawler)
+{
+    // Serve a simplified, text-only response for crawlers
+}
+else
+{
+    // Serve the full interactive experience
+}</code></pre>
+</section>
+
+<section class="section">
+    <h2>MVC Usage</h2>
+    <p>In MVC, use the <code>IsCrawler()</code> helper method on <code>CloudController</code>:</p>
+    <pre><code>public class HomeController(CloudPage cloudPage) : CloudController(cloudPage)
+{
+    public IActionResult Index()
+    {
+        if (IsCrawler())
+            return View("IndexSimple");
+
+        return View();
+    }
+}</code></pre>
+</section>
+
+<section class="section">
+    <h2>Detection Coverage</h2>
+    <p>The built-in list covers @CloudWebConfig.CrawlersUserAgents.Length user-agent substrings including all major search engines, archival bots, SEO tools, and known scraping agents. The list is static and accessed via <code>CloudWebConfig.CrawlersUserAgents</code>.</p>
+    <table class="api-table">
+        <thead>
+            <tr>
+                <th>Category</th>
+                <th>Examples</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr><td>Search engines</td><td>Googlebot, Bingbot, YandexBot, Baiduspider</td></tr>
+            <tr><td>Generic patterns</td><td><code>bot</code>, <code>crawler</code>, <code>spider</code></td></tr>
+            <tr><td>Download tools</td><td><code>wget</code>, <code>curl</code></td></tr>
+            <tr><td>SEO / auditing tools</td><td>AhrefsBot, BLEXBot, SemrushBot</td></tr>
+        </tbody>
+    </table>
+</section>

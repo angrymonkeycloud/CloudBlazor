@@ -1,0 +1,67 @@
+@page "/robots"
+@inject CloudPage CloudPage
+
+@code {
+    protected override void OnInitialized()
+    {
+        CloudPage
+            .SetTitle("Robots Control")
+            .SetDescription("Demonstrating per-page robots meta tag control including index and follow directives.");
+    }
+}
+
+<div class="page-header">
+    <h1>Robots Control</h1>
+    <p class="lead">Control search engine indexing and link-following per page. Staging environments on <code>azurewebsites.net</code> receive <code>noindex, nofollow</code> automatically.</p>
+</div>
+
+<section class="section">
+    <h2>Usage</h2>
+    <pre><code>// Prevent indexing on this page
+CloudPage.SetIndexPage(false);
+
+// Prevent following links on this page
+CloudPage.SetFollowPage(false);
+
+// Explicitly allow both (default)
+CloudPage
+    .SetIndexPage(true)
+    .SetFollowPage(true);</code></pre>
+</section>
+
+<section class="section">
+    <h2>Rendered Output</h2>
+    <table class="api-table">
+        <thead>
+            <tr>
+                <th>IndexPage</th>
+                <th>FollowPage</th>
+                <th>Meta Tag Output</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr><td><code>true</code></td><td><code>true</code></td><td><em>No robots tag emitted</em></td></tr>
+            <tr><td><code>false</code></td><td><code>true</code></td><td><code>&lt;meta name="robots" content="noindex"&gt;</code></td></tr>
+            <tr><td><code>true</code></td><td><code>false</code></td><td><code>&lt;meta name="robots" content="nofollow"&gt;</code></td></tr>
+            <tr><td><code>false</code></td><td><code>false</code></td><td><code>&lt;meta name="robots" content="noindex, nofollow"&gt;</code></td></tr>
+        </tbody>
+    </table>
+</section>
+
+<section class="section">
+    <h2>Automatic Staging Protection</h2>
+    <p>Any request arriving from a host ending in <code>azurewebsites.net</code> automatically receives <code>noindex, nofollow</code>, regardless of per-page settings. This prevents staging or preview deployments from being indexed by search engines.</p>
+    <p>The same logic applies in the MVC <code>CloudController</code> base class, ensuring consistent behaviour across Blazor and MVC applications.</p>
+</section>
+
+<section class="section">
+    <h2>Global Defaults</h2>
+    <p>Set default robots behaviour for all pages during registration:</p>
+    <pre><code>builder.Services.AddCloudWeb(config =>
+{
+    config.PageDefaults
+        .SetIndexPage(true)
+        .SetFollowPage(true);
+});</code></pre>
+    <p>Per-page calls override the defaults using null-coalescing: if a page explicitly sets a value, it wins; otherwise the global default applies.</p>
+</section>

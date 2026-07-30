@@ -1,0 +1,12 @@
+﻿@using Microsoft.AspNetCore.Mvc.ViewFeatures
+@using Microsoft.Extensions.Options
+
+@inject IFileVersionProvider fileVersionProvider
+@inject IOptionsSnapshot<CloudWebConfig> cloudWeb
+
+@namespace AngryMonkey.CloudWeb
+
+@if (!string.IsNullOrEmpty(Result))
+{
+    @((MarkupString)Result)
+}
