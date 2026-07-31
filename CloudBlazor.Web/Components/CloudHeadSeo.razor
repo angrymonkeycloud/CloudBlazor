@@ -1,0 +1,171 @@
+@namespace AngryMonkey.CloudBlazor.Web
+@using Microsoft.AspNetCore.Http
+@using Microsoft.Extensions.Options
+
+@inject IOptionsSnapshot<CloudWebConfig> cloudWeb
+@inject IHttpContextAccessor accessor
+
+@*
+    Discovery and sharing tags. Kept out of CloudHead so the core metadata component
+    stays readable; both render into the same managed head.
+*@
+
+@{
+    string? baseUrl = BaseUrl;
+
+    string? canonical = CloudPage.CanonicalResult(baseUrl);
+    string? socialTitle = CloudPage.SocialTitleResult();
+    string? socialDescription = CloudPage.SocialDescriptionResult();
+    CloudPageImage? image = CloudPage.ImageResult(baseUrl);
+
+    // og:url is the canonical address of the content being shared, so it follows the
+    // canonical tag rather than the address that happened to be requested.
+    string? socialUrl = canonical;
+}
+
+@if (!string.IsNullOrEmpty(canonical))
+{
+    <link rel="canonical" href="@canonical" />
+}
+
+@foreach (CloudAlternateLink alternate in CloudPage.AlternatesResult(baseUrl))
+{
+    <link rel="alternate" hreflang="@alternate.HrefLang" href="@alternate.Href" />
+}
+
+@if (HasOpenGraph)
+{
+    <meta property="og:type" content="@CloudPage.OpenGraphTypeResult()" />
+
+    @if (!string.IsNullOrEmpty(CloudPage.SiteName))
+    {
+        <meta property="og:site_name" content="@CloudPage.SiteName" />
+    }
+
+    @if (!string.IsNullOrEmpty(socialTitle))
+    {
+        <meta property="og:title" content="@socialTitle" />
+    }
+
+    @if (!string.IsNullOrEmpty(socialDescription))
+    {
+        <meta property="og:description" content="@socialDescription" />
+    }
+
+    @if (!string.IsNullOrEmpty(socialUrl))
+    {
+        <meta property="og:url" content="@socialUrl" />
+    }
+
+    @if (!string.IsNullOrEmpty(CloudPage.Locale))
+    {
+        <meta property="og:locale" content="@CloudPage.Locale" />
+    }
+
+    @foreach (string localeAlternate in CloudPage.LocaleAlternates)
+    {
+        <meta property="og:locale:alternate" content="@localeAlternate" />
+    }
+
+    @if (image != null)
+    {
+        <meta property="og:image" content="@image.Url" />
+
+        @if (image.Width.HasValue)
+        {
+            <meta property="og:image:width" content="@image.Width.Value" />
+        }
+
+        @if (image.Height.HasValue)
+        {
+            <meta property="og:image:height" content="@image.Height.Value" />
+        }
+
+        @if (!string.IsNullOrEmpty(image.Alt))
+        {
+            <meta property="og:image:alt" content="@image.Alt" />
+        }
+
+        @if (!string.IsNullOrEmpty(image.MimeTypeResult()))
+        {
+            <meta property="og:image:type" content="@image.MimeTypeResult()" />
+        }
+    }
+}
+
+@if (HasTwitter)
+{
+    <meta name="twitter:card" content="@CloudPage.TwitterCardValueResult()" />
+
+    @if (!string.IsNullOrEmpty(CloudPage.TwitterSite))
+    {
+        <meta name="twitter:site" content="@CloudPage.TwitterSite" />
+    }
+
+    @if (!string.IsNullOrEmpty(CloudPage.TwitterCreator))
+    {
+        <meta name="twitter:creator" content="@CloudPage.TwitterCreator" />
+    }
+
+    @if (!string.IsNullOrEmpty(socialTitle))
+    {
+        <meta name="twitter:title" content="@socialTitle" />
+    }
+
+    @if (!string.IsNullOrEmpty(socialDescription))
+    {
+        <meta name="twitter:description" content="@socialDescription" />
+    }
+
+    @if (image != null)
+    {
+        <meta name="twitter:image" content="@image.Url" />
+
+        @if (!string.IsNullOrEmpty(image.Alt))
+        {
+            <meta name="twitter:image:alt" content="@image.Alt" />
+        }
+    }
+}
+
+@foreach (string structuredData in CloudPage.StructuredDataResult())
+{
+    <script type="application/ld+json">@((MarkupString)structuredData)</script>
+}
+
+@code {
+    [Parameter] public required CloudPage CloudPage { get; set; }
+
+    /// <summary>
+    /// The configured origin, falling back to the current request so relative URLs still
+    /// resolve in a site that never configures one.
+    /// </summary>
+    private string? BaseUrl
+    {
+        get
+        {
+            if (!string.IsNullOrWhiteSpace(cloudWeb.Value.BaseUrl))
+                return cloudWeb.Value.BaseUrl;
+
+            HttpRequest? request = accessor.HttpContext?.Request;
+
+            return request == null ? null : $"{request.Scheme}://{request.Host}";
+        }
+    }
+
+    // Open Graph carries a cost in page weight, so it is emitted only once a page has
+    // something worth previewing rather than on every page by default.
+    private bool HasOpenGraph =>
+        !string.IsNullOrEmpty(CloudPage.SiteName)
+        || !string.IsNullOrEmpty(CloudPage.SocialTitleResult())
+        || !string.IsNullOrEmpty(CloudPage.SocialDescriptionResult())
+        || CloudPage.Image != null
+        || !string.IsNullOrEmpty(CloudPage.OpenGraphType)
+        || !string.IsNullOrEmpty(CloudPage.Locale);
+
+    private bool HasTwitter =>
+        CloudPage.TwitterCard.HasValue
+        || !string.IsNullOrEmpty(CloudPage.TwitterSite)
+        || !string.IsNullOrEmpty(CloudPage.TwitterCreator)
+        || CloudPage.Image != null;
+}

@@ -4,7 +4,7 @@ using System.Text;
 
 namespace AngryMonkey.CloudBlazor.Web;
 
-public class CloudPage
+public partial class CloudPage
 {
     public CloudPage() => IsCrawler = false;
 
@@ -29,6 +29,18 @@ public class CloudPage
     public string? Description { get; internal set; }
     public bool? IndexPage { get; internal set; }
     public bool? FollowPage { get; internal set; }
+
+    /// <summary>Prevents search engines from showing a cached copy of the page.</summary>
+    public bool? NoArchive { get; internal set; }
+
+    /// <summary>Largest image preview a search engine may show.</summary>
+    public CloudMaxImagePreviews? MaxImagePreview { get; internal set; }
+
+    /// <summary>Maximum snippet length in characters. <c>-1</c> lifts the limit, <c>0</c> suppresses snippets.</summary>
+    public int? MaxSnippet { get; internal set; }
+
+    /// <summary>Maximum video preview length in seconds. <c>-1</c> lifts the limit.</summary>
+    public int? MaxVideoPreview { get; internal set; }
     public string? Favicon { get; internal set; }
     public string? ThemeColor { get; internal set; }
     public string? Manifest { get; internal set; }
@@ -159,6 +171,46 @@ public class CloudPage
         return this;
     }
 
+    /// <summary>Prevents search engines from showing a cached copy of the page.</summary>
+    public CloudPage SetNoArchive(bool noArchive)
+    {
+        NoArchive = noArchive;
+
+        OnModified?.Invoke();
+
+        return this;
+    }
+
+    /// <summary>Sets the largest image preview a search engine may show.</summary>
+    public CloudPage SetMaxImagePreview(CloudMaxImagePreviews maxImagePreview)
+    {
+        MaxImagePreview = maxImagePreview;
+
+        OnModified?.Invoke();
+
+        return this;
+    }
+
+    /// <summary>Sets the maximum snippet length. <c>-1</c> lifts the limit, <c>0</c> suppresses snippets.</summary>
+    public CloudPage SetMaxSnippet(int maxSnippet)
+    {
+        MaxSnippet = maxSnippet;
+
+        OnModified?.Invoke();
+
+        return this;
+    }
+
+    /// <summary>Sets the maximum video preview length in seconds. <c>-1</c> lifts the limit.</summary>
+    public CloudPage SetMaxVideoPreview(int maxVideoPreview)
+    {
+        MaxVideoPreview = maxVideoPreview;
+
+        OnModified?.Invoke();
+
+        return this;
+    }
+
     public CloudPage SetTitleAddOns(IEnumerable<string> titleAddOns)
     {
         _titleAddOns.Clear();
@@ -198,6 +250,30 @@ public class CloudPage
 
         if (FollowPage.HasValue && !FollowPage.Value)
             content.Add("nofollow");
+
+        // A page excluded from the index gains nothing from preview or snippet limits, and
+        // pairing them reads as contradictory. noindex wins outright.
+        bool indexable = !IndexPage.HasValue || IndexPage.Value;
+
+        if (indexable)
+        {
+            if (NoArchive == true)
+                content.Add("noarchive");
+
+            if (MaxImagePreview.HasValue)
+                content.Add($"max-image-preview:{MaxImagePreview.Value switch
+                {
+                    CloudMaxImagePreviews.None => "none",
+                    CloudMaxImagePreviews.Standard => "standard",
+                    _ => "large"
+                }}");
+
+            if (MaxSnippet.HasValue)
+                content.Add($"max-snippet:{MaxSnippet.Value}");
+
+            if (MaxVideoPreview.HasValue)
+                content.Add($"max-video-preview:{MaxVideoPreview.Value}");
+        }
 
         if (content.Any())
             return string.Join(", ", content);

@@ -108,9 +108,11 @@ Because all four are new package identities shipping as a matched set, versionin
 
 - HTML document generation
 - Layout infrastructure
-- SEO helpers
-- Metadata and Open Graph
-- Website routing
+- Page metadata, canonical URLs and `hreflang` alternates
+- Open Graph, Twitter cards and JSON-LD structured data
+- `sitemap.xml` and `robots.txt` endpoints
+- Robots directives and crawler detection
+- Asset bundles with cache-busting
 - Server-side website features
 
 ### AngryMonkey.CloudBlazor.App
@@ -220,8 +222,9 @@ dotnet run --project CloudBlazor.Demo/CloudBlazor.Demo.csproj
 ```
 
 The demo is one Blazor Web App covering all three web-capable packages: CloudBlazor's browser
-behaviors, CloudBlazor.Web's metadata, bundles, robots directives and crawler detection, and
-CloudBlazor.App's navigation service — each on its own page with live state.
+behaviors, CloudBlazor.Web's metadata, canonical and social tags, sitemap and robots.txt,
+bundles, robots directives and crawler detection, and CloudBlazor.App's navigation service —
+each on its own page with live state. It serves a real `/sitemap.xml` and `/robots.txt`.
 
 ### Continuous integration
 

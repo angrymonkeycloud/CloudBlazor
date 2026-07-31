@@ -18,6 +18,11 @@ builder.Services.AddCloudWeb(config =>
         .SetKeywords("blazor, razor, components, seo, metadata, bundles, webassembly, maui")
         .SetFavicon("/favicon.png")
         .SetThemeColor("#4f8ef7")
+        // Site-wide sharing defaults; a page overrides any of these individually.
+        .SetSiteName("CloudBlazor")
+        .SetLocale("en_US")
+        .SetMaxImagePreview(CloudMaxImagePreviews.Large)
+        .SetMaxSnippet(-1)
         .AppendBundle(new CloudBundle
         {
             Source = "css/app.css",
@@ -45,6 +50,24 @@ app.UseHttpsRedirection();
 app.MapStaticAssets();
 
 app.UseAntiforgery();
+
+// The two site-level SEO files, generated from code rather than kept in wwwroot.
+app.MapCloudSitemap(sitemap => sitemap
+    .Add("/", changeFrequency: CloudChangeFrequencies.Weekly, priority: 1.0)
+    .Add("/behaviors/initialization")
+    .Add("/behaviors/home-link")
+    .Add("/web/metadata")
+    .Add("/web/discovery")
+    .Add("/web/sitemap")
+    .Add("/web/bundles")
+    .Add("/web/features")
+    .Add("/web/robots")
+    .Add("/web/crawler")
+    .Add("/app/navigation"));
+
+app.MapCloudRobotsTxt(robots => robots
+    .Allow("/")
+    .AddSitemap("/sitemap.xml"));
 
 app.MapRazorComponents<App>().AddInteractiveServerRenderMode();
 

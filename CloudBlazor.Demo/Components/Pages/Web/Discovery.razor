@@ -1,0 +1,204 @@
+@page "/web/discovery"
+@inject CloudPage CloudPage
+
+<PageIntro Package="AngryMonkey.CloudBlazor.Web" Title="Canonical &amp; Social">
+    Canonical URLs, language alternates, Open Graph and Twitter cards, and JSON-LD structured
+    data — all set through the same <code>CloudPage</code> fluent API.
+</PageIntro>
+
+<section class="section">
+    <h2>Canonical URL</h2>
+
+    <p>
+        Tells a search engine which address is authoritative when the same content answers on
+        more than one URL — a trailing slash, a tracking parameter, or a second route to the
+        same page.
+    </p>
+
+    <pre><code>CloudPage.SetCanonical("/web/discovery");</code></pre>
+
+    <p>
+        Relative values are resolved against <code>CloudWebConfig.BaseUrl</code>, or the current
+        request when no base URL is configured.
+    </p>
+
+    <div class="result-grid">
+        <ResultRow Label="Canonical">
+            <code>@CloudPage.CanonicalResult()</code>
+        </ResultRow>
+        <ResultRow Label="Resolved">
+            <code>@CloudPage.CanonicalResult("https://cloudblazor.example")</code>
+        </ResultRow>
+    </div>
+</section>
+
+<section class="section">
+    <h2>Language alternates</h2>
+
+    <p>
+        Each translation of a page points at every other one, so a search engine can serve the
+        right language instead of treating the set as duplicate content. <code>x-default</code>
+        marks the fallback for unmatched locales.
+    </p>
+
+    <pre><code>CloudPage
+    .AddAlternate("en", "/web/discovery")
+    .AddAlternate("ar", "/ar/web/discovery")
+    .AddAlternate(CloudAlternateLink.XDefault, "/web/discovery");</code></pre>
+
+    <div class="result-grid">
+        @foreach (CloudAlternateLink alternate in CloudPage.Alternates)
+        {
+            <ResultRow Label="@alternate.HrefLang">
+                <code>@alternate.Href</code>
+            </ResultRow>
+        }
+    </div>
+
+    <p>Adding the same <code>hreflang</code> twice replaces it rather than emitting a contradiction.</p>
+</section>
+
+<section class="section">
+    <h2>Open Graph and Twitter</h2>
+
+    <p>
+        What a link looks like when it is pasted into a chat, a social post or a preview card.
+        The title and description fall back to the page's own metadata, so most pages need
+        nothing beyond an image.
+    </p>
+
+    <pre><code>CloudPage
+    .SetSiteName("CloudBlazor")
+    .SetOpenGraphType("article")
+    .SetLocale("en_US")
+    .SetImage(new CloudPageImage
+    {
+        Url    = "/favicon.png",
+        Width  = 512,
+        Height = 512,
+        Alt    = "CloudBlazor"
+    })
+    .SetTwitterSite("@@angrymonkeycloud");</code></pre>
+
+    <div class="result-grid">
+        <ResultRow Label="og:type">
+            <code>@CloudPage.OpenGraphTypeResult()</code>
+        </ResultRow>
+        <ResultRow Label="og:site_name">
+            <code>@CloudPage.SiteName</code>
+        </ResultRow>
+        <ResultRow Label="og:title">
+            <code>@CloudPage.SocialTitleResult()</code>
+        </ResultRow>
+        <ResultRow Label="og:image">
+            <code>@CloudPage.ImageResult()?.Url</code>
+        </ResultRow>
+        <ResultRow Label="og:image:type">
+            <code>@CloudPage.ImageResult()?.MimeTypeResult()</code>
+        </ResultRow>
+        <ResultRow Label="twitter:card">
+            <code>@CloudPage.TwitterCardValueResult()</code>
+        </ResultRow>
+    </div>
+
+    <p>
+        The card layout defaults to <code>summary_large_image</code> once an image is set, and
+        <code>summary</code> when there is none. The social title uses the raw page title rather
+        than the composed one: a site-wide suffix reads as noise in a shared link, where the site
+        name already appears separately.
+    </p>
+</section>
+
+<section class="section">
+    <h2>Structured data</h2>
+
+    <p>
+        JSON-LD describes what a page <em>is</em>, which is what makes rich results possible.
+        Pass any object, or a string of JSON you already have.
+    </p>
+
+    <pre><code>CloudPage.AddStructuredData(new Dictionary&lt;string, object&gt;
+{
+    ["@@context"] = "https://schema.org",
+    ["@@type"]    = "SoftwareApplication",
+    ["name"]      = "CloudBlazor",
+});</code></pre>
+
+    <div class="result-grid">
+        @foreach (string document in CloudPage.StructuredData)
+        {
+            <ResultRow Label="ld+json">
+                <code>@document</code>
+            </ResultRow>
+        }
+    </div>
+
+    <p>
+        Non-ASCII text is left unescaped, so Arabic or Chinese content stays readable instead of
+        tripling in size. View source to see the <code>application/ld+json</code> script in
+        <code>&lt;head&gt;</code>.
+    </p>
+</section>
+
+<section class="section">
+    <h2>API</h2>
+
+    <div class="table-scroll">
+        <table class="api-table">
+            <thead>
+                <tr>
+                    <th>Method</th>
+                    <th>Description</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr><td><code>SetCanonical(string)</code></td><td>Sets the authoritative URL for this content.</td></tr>
+                <tr><td><code>AddAlternate(string, string)</code></td><td>Adds a language variant. Repeating a language replaces it.</td></tr>
+                <tr><td><code>SetAlternates(IEnumerable&lt;CloudAlternateLink&gt;)</code></td><td>Replaces every language alternate.</td></tr>
+                <tr><td><code>SetSiteName(string)</code></td><td>Sets the site name shown in link previews.</td></tr>
+                <tr><td><code>SetOpenGraphType(string)</code></td><td>Sets the Open Graph type. Defaults to <code>website</code>.</td></tr>
+                <tr><td><code>SetSocialTitle(string)</code></td><td>Overrides the preview title, which otherwise follows the page title.</td></tr>
+                <tr><td><code>SetSocialDescription(string)</code></td><td>Overrides the preview description.</td></tr>
+                <tr><td><code>SetImage(string)</code> / <code>SetImage(CloudPageImage)</code></td><td>Sets the preview image shared by Open Graph and Twitter.</td></tr>
+                <tr><td><code>SetLocale(string)</code> / <code>AddLocaleAlternates(params string[])</code></td><td>Sets this page's locale and the others it exists in.</td></tr>
+                <tr><td><code>SetTwitterCard(CloudTwitterCards)</code></td><td>Sets the card layout explicitly.</td></tr>
+                <tr><td><code>SetTwitterSite(string)</code> / <code>SetTwitterCreator(string)</code></td><td>Sets the site and author handles.</td></tr>
+                <tr><td><code>AddStructuredData(object)</code> / <code>AddStructuredData(string)</code></td><td>Adds a JSON-LD document.</td></tr>
+            </tbody>
+        </table>
+    </div>
+</section>
+
+@code {
+    protected override void OnInitialized()
+    {
+        CloudPage
+            .SetTitle("Canonical & Social")
+            .SetDescription("Canonical URLs, hreflang alternates, Open Graph, Twitter cards and JSON-LD structured data.")
+            .SetKeywords("canonical, hreflang, open graph, twitter cards, json-ld, structured data")
+            .SetCanonical("/web/discovery")
+            .AddAlternate("en", "/web/discovery")
+            .AddAlternate("ar", "/ar/web/discovery")
+            .AddAlternate(CloudAlternateLink.XDefault, "/web/discovery")
+            .SetSiteName("CloudBlazor")
+            .SetOpenGraphType("article")
+            .SetLocale("en_US")
+            .AddLocaleAlternates("ar_AR")
+            .SetImage(new CloudPageImage
+            {
+                Url = "/favicon.png",
+                Width = 512,
+                Height = 512,
+                Alt = "CloudBlazor"
+            })
+            .SetTwitterSite("@angrymonkeycloud")
+            .AddStructuredData(new Dictionary<string, object>
+            {
+                ["@context"] = "https://schema.org",
+                ["@type"] = "SoftwareApplication",
+                ["name"] = "CloudBlazor",
+                ["applicationCategory"] = "DeveloperApplication",
+                ["operatingSystem"] = "Any"
+            });
+    }
+}

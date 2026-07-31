@@ -65,6 +65,28 @@ CloudPage.SetFollowPage(false);  // nofollow</code></pre>
 </section>
 
 <section class="section">
+    <h2>Preview and snippet directives</h2>
+
+    <p>
+        Beyond indexing, a page can state how much of itself a result may show.
+        <code>max-image-preview:large</code> is what makes a page eligible for a large
+        thumbnail, and for Google Discover.
+    </p>
+
+    <pre><code>CloudPage
+    .SetMaxImagePreview(CloudMaxImagePreviews.Large)
+    .SetMaxSnippet(-1)          // -1 lifts the limit, 0 suppresses snippets
+    .SetMaxVideoPreview(-1)
+    .SetNoArchive(true);        // no cached copy</code></pre>
+
+    <p>
+        These are dropped when the page is <code>noindex</code>: an excluded page has no preview
+        to size, so pairing them would be contradictory. Setting them site-wide in
+        <code>PageDefaults</code> is usually what you want.
+    </p>
+</section>
+
+<section class="section">
     <h2>Preview host protection</h2>
 
     <p>

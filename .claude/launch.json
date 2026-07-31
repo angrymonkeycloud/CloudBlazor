@@ -1,0 +1,17 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "demo",
+      "runtimeExecutable": "dotnet",
+      "runtimeArgs": [
+        "run",
+        "--project",
+        "CloudBlazor.Demo/CloudBlazor.Demo.csproj",
+        "--urls",
+        "http://localhost:5310"
+      ],
+      "port": 5310
+    }
+  ]
+}

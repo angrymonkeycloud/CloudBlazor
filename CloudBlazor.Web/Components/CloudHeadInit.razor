@@ -38,6 +38,28 @@
                     ThemeColor = _page.ThemeColor ?? cloudWeb.Value.PageDefaults.ThemeColor,
                     Manifest = _page.Manifest ?? cloudWeb.Value.PageDefaults.Manifest,
 
+                    // Robots directives
+
+                    NoArchive = _page.NoArchive ?? cloudWeb.Value.PageDefaults.NoArchive,
+                    MaxImagePreview = _page.MaxImagePreview ?? cloudWeb.Value.PageDefaults.MaxImagePreview,
+                    MaxSnippet = _page.MaxSnippet ?? cloudWeb.Value.PageDefaults.MaxSnippet,
+                    MaxVideoPreview = _page.MaxVideoPreview ?? cloudWeb.Value.PageDefaults.MaxVideoPreview,
+
+                    // Discovery and sharing.
+                    // Canonical is deliberately not inherited: a default canonical would point
+                    // every page at the same URL, which is the one mistake that de-indexes a site.
+
+                    Canonical = _page.Canonical,
+                    OpenGraphType = _page.OpenGraphType ?? cloudWeb.Value.PageDefaults.OpenGraphType,
+                    SiteName = _page.SiteName ?? cloudWeb.Value.PageDefaults.SiteName,
+                    SocialTitle = _page.SocialTitle ?? cloudWeb.Value.PageDefaults.SocialTitle,
+                    SocialDescription = _page.SocialDescription ?? cloudWeb.Value.PageDefaults.SocialDescription,
+                    Image = _page.Image ?? cloudWeb.Value.PageDefaults.Image,
+                    Locale = _page.Locale ?? cloudWeb.Value.PageDefaults.Locale,
+                    TwitterCard = _page.TwitterCard ?? cloudWeb.Value.PageDefaults.TwitterCard,
+                    TwitterSite = _page.TwitterSite ?? cloudWeb.Value.PageDefaults.TwitterSite,
+                    TwitterCreator = _page.TwitterCreator ?? cloudWeb.Value.PageDefaults.TwitterCreator,
+
                     // Not Nullable
 
                     Favicon = _page.Favicon ?? cloudWeb.Value.PageDefaults.Favicon,
@@ -46,6 +68,17 @@
                 };
 
             config.SetTitleAddOns(_page.TitleAddOns ?? cloudWeb.Value.PageDefaults.TitleAddOns);
+
+            // Collections merge like bundles do: site-wide entries first, then the page's own.
+            config._alternates.Clear();
+            config._alternates.AddRange(_page.Alternates.Count > 0 ? _page.Alternates : cloudWeb.Value.PageDefaults.Alternates);
+
+            config._localeAlternates.Clear();
+            config._localeAlternates.AddRange(_page.LocaleAlternates.Count > 0 ? _page.LocaleAlternates : cloudWeb.Value.PageDefaults.LocaleAlternates);
+
+            config._structuredData.Clear();
+            config._structuredData.AddRange(cloudWeb.Value.PageDefaults.StructuredData);
+            config._structuredData.AddRange(_page.StructuredData);
 
             config._bundles.Clear();
             config._bundles.AddRange(cloudWeb.Value.PageDefaults.Bundles);
@@ -56,7 +89,51 @@
             config._features.AddRange(cloudWeb.Value.PageDefaults.Features);
             config._features.AddRange(_page.Features);
 
+            ApplyLocalization(config);
+
             return config;
+        }
+    }
+
+    /// <summary>
+    /// Fills in the language-derived tags a multilingual site would otherwise repeat on every
+    /// page. Anything the page set explicitly is left alone.
+    /// </summary>
+    private void ApplyLocalization(CloudPage config)
+    {
+        CloudLocalizationOptions? localization = cloudWeb.Value.Localization;
+
+        if (localization == null)
+            return;
+
+        // A page kept out of the index has no canonical address to claim and no translation
+        // set to join. An error page in particular stands in for many URLs at once, so
+        // pointing it at one of them would be wrong.
+        if (config.IndexPage == false)
+            return;
+
+        string? path = _accessor.HttpContext?.Request.Path.Value;
+
+        if (path == null)
+            return;
+
+        string neutral = localization.NeutralPath(path);
+        string culture = localization.CultureOf(path);
+
+        if (localization.AutoCanonical && string.IsNullOrWhiteSpace(config.Canonical))
+            config.Canonical = localization.PathFor(culture, neutral);
+
+        if (localization.AutoAlternates && config._alternates.Count == 0)
+            config._alternates.AddRange(localization.AlternatesFor(neutral));
+
+        if (localization.AutoLocale)
+        {
+            config.Locale ??= localization.LocaleFor(culture);
+
+            if (config._localeAlternates.Count == 0)
+                config._localeAlternates.AddRange(localization.SupportedCultures
+                    .Where(other => !string.Equals(other, culture, StringComparison.OrdinalIgnoreCase))
+                    .Select(localization.LocaleFor));
         }
     }
 

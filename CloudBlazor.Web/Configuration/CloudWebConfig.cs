@@ -11,6 +11,27 @@ public class CloudWebConfig
     public string TitleSuffix { get; set; } = string.Empty;
 
     /// <summary>
+    /// Canonical origin of the site, such as <c>https://example.com</c>, used to make
+    /// canonical URLs, language alternates, preview images and sitemap locations absolute.
+    /// </summary>
+    /// <remarks>
+    /// Optional: the request's own scheme and host are used when this is not set. Configure it
+    /// when the public address differs from what the application sees — behind a proxy or CDN,
+    /// or when the site answers on more than one host and only one of them is canonical.
+    /// </remarks>
+    public string? BaseUrl { get; set; }
+
+    /// <summary>
+    /// How the site's languages map onto its URLs. When set, canonical links, <c>hreflang</c>
+    /// alternates and <c>og:locale</c> are derived from the request path for any page that
+    /// does not set them itself.
+    /// </summary>
+    /// <remarks>
+    /// Leave <c>null</c> for a single-language site: nothing is derived and nothing is emitted.
+    /// </remarks>
+    public CloudLocalizationOptions? Localization { get; set; }
+
+    /// <summary>
     /// Emits the CloudBlazor browser-behavior module into the managed head content.
     /// Enabled by default.
     /// </summary>

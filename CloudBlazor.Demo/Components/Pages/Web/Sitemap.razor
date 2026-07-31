@@ -1,0 +1,147 @@
+@page "/web/sitemap"
+@inject CloudPage CloudPage
+
+<PageIntro Package="AngryMonkey.CloudBlazor.Web" Title="Sitemap &amp; robots.txt">
+    The two files every crawler looks for, mapped as endpoints and generated from code rather
+    than kept in <code>wwwroot</code> and left to drift.
+</PageIntro>
+
+<section class="section">
+    <h2>Endpoints</h2>
+
+    <pre><code>app.MapCloudSitemap(sitemap => sitemap
+    .Add("/", changeFrequency: CloudChangeFrequencies.Weekly, priority: 1.0)
+    .Add("/web/metadata")
+    .Add("/web/discovery"));
+
+app.MapCloudRobotsTxt();</code></pre>
+
+    <p>
+        Both are live on this site:
+        <a href="/sitemap.xml" target="_blank" rel="noopener">/sitemap.xml</a> and
+        <a href="/robots.txt" target="_blank" rel="noopener">/robots.txt</a>.
+    </p>
+
+    <p>
+        Relative locations are made absolute against <code>CloudWebConfig.BaseUrl</code>, or the
+        current request when none is configured — so the same code produces correct URLs in
+        development and in production.
+    </p>
+</section>
+
+<section class="section">
+    <h2>Generated output</h2>
+
+    <p>Built with the same API the endpoint uses, rendered here against an example origin.</p>
+
+    <pre><code>@_sampleXml</code></pre>
+</section>
+
+<section class="section">
+    <h2>Localized pages</h2>
+
+    <p>
+        <code>AddLocalized</code> writes one URL per language and cross-links every variant from
+        each of them. Search engines require that set to be complete and reciprocal, which is
+        tedious to maintain by hand.
+    </p>
+
+    <pre><code>sitemap.AddLocalized(
+[
+    new CloudAlternateLink("en", "/about"),
+    new CloudAlternateLink("ar", "/ar/about"),
+], xDefault: "en");</code></pre>
+
+    <pre><code>@_localizedXml</code></pre>
+</section>
+
+<section class="section">
+    <h2>robots.txt rules</h2>
+
+    <p>
+        With no configuration the file allows everything and advertises
+        <code>/sitemap.xml</code>. Rules are grouped per user agent.
+    </p>
+
+    <pre><code>app.MapCloudRobotsTxt(robots => robots
+    .Allow("/")
+    .Disallow("/admin")
+    .Disallow("/internal", "Googlebot")
+    .CrawlDelay(1)
+    .AddSitemap("/sitemap.xml"));</code></pre>
+
+    <pre><code>@_robotsSample</code></pre>
+
+    <p>
+        A request to a non-production host is served <code>Disallow: /</code> instead, the same
+        protection the robots meta tag applies to preview deployments.
+    </p>
+
+    <p>
+        <code>robots.txt</code> governs <em>crawling</em>; the robots meta tag governs
+        <em>indexing</em>. A URL disallowed here can still be indexed from an external link, so
+        use <code>SetIndexPage(false)</code> to keep a page out of an index.
+    </p>
+</section>
+
+<section class="section">
+    <h2>API</h2>
+
+    <div class="table-scroll">
+        <table class="api-table">
+            <thead>
+                <tr>
+                    <th>Method</th>
+                    <th>Description</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr><td><code>MapCloudSitemap(Action&lt;CloudSitemap&gt;)</code></td><td>Maps <code>/sitemap.xml</code> from a static set of entries.</td></tr>
+                <tr><td><code>MapCloudSitemap(Func&lt;HttpContext, CloudSitemap, Task&gt;)</code></td><td>Builds the sitemap per request, for entries that come from a database.</td></tr>
+                <tr><td><code>MapCloudRobotsTxt()</code></td><td>Allows everything and advertises <code>/sitemap.xml</code>.</td></tr>
+                <tr><td><code>MapCloudRobotsTxt(Action&lt;CloudRobotsFile&gt;)</code></td><td>Maps <code>/robots.txt</code> from explicit rules.</td></tr>
+                <tr><td><code>CloudSitemap.Add(...)</code></td><td>Adds a URL with optional last-modified, change frequency, priority and alternates.</td></tr>
+                <tr><td><code>CloudSitemap.AddLocalized(...)</code></td><td>Adds one URL per language, fully cross-linked.</td></tr>
+            </tbody>
+        </table>
+    </div>
+</section>
+
+@code {
+    private string _sampleXml = string.Empty;
+    private string _localizedXml = string.Empty;
+    private string _robotsSample = string.Empty;
+
+    protected override void OnInitialized()
+    {
+        CloudPage
+            .SetTitle("Sitemap & robots.txt")
+            .SetDescription("Generate sitemap.xml and robots.txt from code, with language alternates and preview-host protection.")
+            .SetKeywords("sitemap, robots.txt, crawling, indexing, hreflang");
+
+        CloudSitemap sample = new();
+        sample.Add("/", changeFrequency: CloudChangeFrequencies.Weekly, priority: 1.0)
+              .Add("/web/metadata", lastModified: new DateTimeOffset(2026, 1, 15, 0, 0, 0, TimeSpan.Zero))
+              .Add("/web/discovery");
+
+        _sampleXml = sample.ToXml("https://cloudblazor.example");
+
+        CloudSitemap localized = new();
+        localized.AddLocalized(
+        [
+            new CloudAlternateLink("en", "/about"),
+            new CloudAlternateLink("ar", "/ar/about")
+        ], xDefault: "en");
+
+        _localizedXml = localized.ToXml("https://cloudblazor.example");
+
+        CloudRobotsFile robots = new();
+        robots.Allow("/")
+              .Disallow("/admin")
+              .Disallow("/internal", "Googlebot")
+              .CrawlDelay(1)
+              .AddSitemap("/sitemap.xml");
+
+        _robotsSample = robots.ToFileContent("https://cloudblazor.example");
+    }
+}
