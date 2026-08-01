@@ -14,8 +14,9 @@
 		<RootNamespace>CloudBlazor.Package</RootNamespace>
 		<AssemblyName>CloudBlazor.Package</AssemblyName>
 		<IsPackable>false</IsPackable>
-
-		<Version>1.0.0</Version>
+		<Authors>Angry Monkey</Authors>
+		<Company>Angry Monkey</Company>
+		<Version>1.0.1</Version>
 		<AssemblyVersion>$(PackageVersion)</AssemblyVersion>
 		<FileVersion>$(PackageVersion)</FileVersion>
 		<PackageIcon>amc-logo.png</PackageIcon>

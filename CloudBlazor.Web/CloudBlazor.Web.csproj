@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk.Razor">
+﻿<Project Sdk="Microsoft.NET.Sdk.Razor">
 
 	<PropertyGroup>
 		<AssemblyName>AngryMonkey.CloudBlazor.Web</AssemblyName>
@@ -9,12 +9,12 @@
 		<Description>Server-side website infrastructure for Blazor and MVC applications: page head metadata, SEO and robots directives, asset bundles, and crawler detection.</Description>
 		<PackageTags>blazor;aspnetcore;mvc;seo;metadata;bundles;head;angrymonkey</PackageTags>
 
-		<Version>1.0.0</Version>
+		<Version>1.0.1</Version>
 		<AssemblyVersion>$(PackageVersion)</AssemblyVersion>
 		<FileVersion>$(PackageVersion)</FileVersion>
 
 		<IsPackable>true</IsPackable>
-	</PropertyGroup>
+	<Authors>Angry Monkey</Authors><Company>Angry Monkey</Company><PackageIcon>amc-logo.png</PackageIcon></PropertyGroup>
 
 	<!--
 		The shared framework covers everything this library binds against (MVC view
@@ -30,4 +30,4 @@
 		<ProjectReference Include="..\CloudBlazor\CloudBlazor.csproj" />
 	</ItemGroup>
 
-</Project>
+<ItemGroup><None Update="amc-logo.png"><Pack>True</Pack><PackagePath>\</PackagePath></None></ItemGroup></Project>

@@ -353,7 +353,8 @@ public partial class CloudPage
         if (string.IsNullOrWhiteSpace(url))
             return null;
 
-        if (Uri.TryCreate(url, UriKind.Absolute, out Uri? absolute))
+        if (Uri.TryCreate(url, UriKind.Absolute, out Uri? absolute)
+            && (absolute.Scheme == Uri.UriSchemeHttp || absolute.Scheme == Uri.UriSchemeHttps))
             return absolute.ToString();
 
         if (string.IsNullOrWhiteSpace(baseUrl) || !Uri.TryCreate(baseUrl, UriKind.Absolute, out Uri? root))
