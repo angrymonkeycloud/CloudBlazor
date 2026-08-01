@@ -65,6 +65,20 @@ public class CloudPageTests
     }
 
     [Fact]
+    public void DescriptionResult_DoesNotCutTheFinalWord_WhenAUsefulBoundaryExists()
+    {
+        string description = string.Join(' ', Enumerable.Repeat("helpful", 30));
+        CloudPage page = new();
+        page.SetDescription(description);
+
+        string result = page.DescriptionResult()!;
+
+        result.Should().EndWith("helpful...");
+        result.Should().NotContain("helpf...");
+        result.Length.Should().BeLessThanOrEqualTo(160);
+    }
+
+    [Fact]
     public void DescriptionResult_ReturnsNull_WhenNotSet()
     {
         CloudPage page = new();
@@ -116,6 +130,81 @@ public class CloudPageTests
         CloudPage page = new();
         page.SetManifest("/site.webmanifest");
         page.ManifestResult().Should().Be("/site.webmanifest");
+    }
+
+    [Fact]
+    public void AddHeadLinks_StoresReusableHeadResources_InOrder()
+    {
+        CloudPage page = new();
+
+        page.AddHeadLinks(
+            AngryMonkey.CloudBlazor.CloudHeadLink.Icon("/favicon.svg", "image/svg+xml"),
+            AngryMonkey.CloudBlazor.CloudHeadLink.Preload("/fonts/site.woff2", "font", "font/woff2", "anonymous"));
+
+        page.HeadLinks.Select(link => link.Rel).Should().Equal("icon", "preload");
+        page.HeadLinks[1].CrossOrigin.Should().Be("anonymous");
+    }
+
+    [Fact]
+    public void AddHeadLink_ReplacesDuplicateRelAndHref()
+    {
+        CloudPage page = new();
+
+        page.AddHeadLink(AngryMonkey.CloudBlazor.CloudHeadLink.Icon("/favicon.png", "image/png", "32x32"));
+        page.AddHeadLink(AngryMonkey.CloudBlazor.CloudHeadLink.Icon("/favicon.png", "image/png", "96x96"));
+
+        page.HeadLinks.Should().ContainSingle().Which.Sizes.Should().Be("96x96");
+    }
+
+    [Theory]
+    [InlineData("/favicon.svg", "image/svg+xml")]
+    [InlineData("/favicon.png?v=4", "image/png")]
+    [InlineData("/fonts/site.woff2", "font/woff2")]
+    [InlineData("/assets/site.css", "text/css")]
+    public void HeadLink_TypeResult_InfersMimeTypeFromUrl(string href, string expected)
+    {
+        new AngryMonkey.CloudBlazor.CloudHeadLink { Rel = "preload", Href = href }
+            .TypeResult().Should().Be(expected);
+    }
+
+    [Fact]
+    public void HeadLink_TypeResult_PrefersExplicitType()
+    {
+        AngryMonkey.CloudBlazor.CloudHeadLink.Icon("/favicon.bin", "image/png")
+            .TypeResult().Should().Be("image/png");
+    }
+
+    [Fact]
+    public void LocalizedFontPreload_ResolvesBothHrefAndMimeType()
+    {
+        AngryMonkey.CloudBlazor.CloudHeadLink link = AngryMonkey.CloudBlazor.CloudHeadLink.LocalizedFontPreload(
+            "/fonts/site.woff2",
+            new Dictionary<string, string> { ["ar"] = "/fonts/site-ar.woff2" });
+
+        link.HrefResult(new System.Globalization.CultureInfo("ar-LB")).Should().Be("/fonts/site-ar.woff2");
+        link.TypeResult(new System.Globalization.CultureInfo("ar-LB")).Should().Be("font/woff2");
+        link.CrossOrigin.Should().Be("anonymous");
+    }
+
+    [Fact]
+    public void Reset_ClearsRouteSpecificMetadataAndCollections()
+    {
+        CloudPage page = new();
+        page.SetTitle("Old route")
+            .SetDescription("Old description")
+            .SetCanonical("/old")
+            .SetIndexPage(false)
+            .AddHeadLink(AngryMonkey.CloudBlazor.CloudHeadLink.Icon("/old.svg"))
+            .AddStructuredData(new { name = "Old route" });
+
+        page.Reset();
+
+        page.Title.Should().BeNull();
+        page.Description.Should().BeNull();
+        page.Canonical.Should().BeNull();
+        page.IndexPage.Should().BeNull();
+        page.HeadLinks.Should().BeEmpty();
+        page.StructuredData.Should().BeEmpty();
     }
 
     // ── SetIndexPage / SetFollowPage / RobotsResult ───────────────────────

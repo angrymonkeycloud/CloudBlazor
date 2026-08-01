@@ -1,11 +1,13 @@
 ﻿@namespace AngryMonkey.CloudBlazor.Web
 @implements IDisposable
 @using Microsoft.AspNetCore.Http
+@using Microsoft.AspNetCore.Components.Routing
 @using Microsoft.Extensions.Options
 
 @inject IOptionsSnapshot<CloudWebConfig> cloudWeb
 @inject CloudPage _page
 @inject IHttpContextAccessor _accessor
+@inject NavigationManager _navigation
 
 @{
     CloudPage pageConfig = PageConfig;
@@ -84,6 +86,18 @@
             config._bundles.AddRange(cloudWeb.Value.PageDefaults.Bundles);
             config._bundles.AddRange(_page.Bundles);
 
+            config._headLinks.Clear();
+            config._headLinks.AddRange(cloudWeb.Value.PageDefaults.HeadLinks);
+
+            foreach (CloudHeadLink link in _page.HeadLinks)
+            {
+                config._headLinks.RemoveAll(existing =>
+                    string.Equals(existing.Rel, link.Rel, StringComparison.OrdinalIgnoreCase) &&
+                    string.Equals(existing.Href, link.Href, StringComparison.OrdinalIgnoreCase));
+
+                config._headLinks.Add(link);
+            }
+
 
             config._features.Clear();
             config._features.AddRange(cloudWeb.Value.PageDefaults.Features);
@@ -137,9 +151,19 @@
         }
     }
 
-    protected override void OnInitialized() => _page.OnModified += OnPageModified;
+    protected override void OnInitialized()
+    {
+        _page.OnModified += OnPageModified;
+        _navigation.LocationChanged += OnLocationChanged;
+    }
+
+    private void OnLocationChanged(object? sender, LocationChangedEventArgs args) => _page.Reset();
 
     private void OnPageModified() => _ = InvokeAsync(StateHasChanged);
 
-    public void Dispose() => _page.OnModified -= OnPageModified;
+    public void Dispose()
+    {
+        _page.OnModified -= OnPageModified;
+        _navigation.LocationChanged -= OnLocationChanged;
+    }
 }

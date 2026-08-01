@@ -1,0 +1,18 @@
+@namespace AngryMonkey.CloudBlazor
+
+@foreach (CloudHeadLink link in Links)
+{
+    <link rel="@link.Rel"
+          href="@link.HrefResult()"
+          as="@link.As"
+          type="@link.TypeResult()"
+          sizes="@link.Sizes"
+          media="@link.Media"
+          crossorigin="@link.CrossOrigin"
+          fetchpriority="@link.FetchPriority" />
+}
+
+@code {
+    [Parameter]
+    public IReadOnlyCollection<CloudHeadLink> Links { get; set; } = [];
+}

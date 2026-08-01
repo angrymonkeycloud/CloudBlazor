@@ -14,7 +14,9 @@ Formerly published as `AngryMonkey.CloudWeb` and `AngryMonkey.CloudWeb.Server`. 
 
 ## Features
 
-- Fluent per-page metadata: title, description, keywords, favicon, theme colour, web app manifest
+- Fluent per-page metadata: title, description, icons, theme colour, web app manifest
+- Multiple favicon formats, Apple touch icons, and performance resource hints
+- Route metadata is reset automatically during interactive navigation
 - Application-wide defaults through `CloudWebConfig`, overridden per page
 - Title prefix and suffix, title add-ons, and automatic 64-character limiting
 - Description truncation at 160 characters
@@ -42,6 +44,7 @@ dotnet add package AngryMonkey.CloudBlazor.Web
 ### 1. Register
 
 ```csharp
+using AngryMonkey.CloudBlazor;
 using AngryMonkey.CloudBlazor.Web;
 
 builder.Services.AddCloudWeb(config =>
@@ -55,6 +58,11 @@ builder.Services.AddCloudWeb(config =>
         .SetFavicon("/favicon.svg")
         .SetThemeColor("#0B5FFF")
         .SetManifest("/site.webmanifest");
+
+    config.PageDefaults.AddHeadLinks(
+        CloudHeadLink.Icon("/favicon-96x96.png", sizes: "96x96"),
+        CloudHeadLink.AppleTouchIcon("/apple-touch-icon.png", "180x180"),
+        CloudHeadLink.FontPreload("/fonts/site.woff2"));
 });
 ```
 
@@ -154,6 +162,34 @@ All setters return `this` and raise `OnModified`, which re-renders the head.
 | `SetThemeColor(string)` | Sets the browser UI theme colour. |
 | `SetManifest(string)` | Sets the web app manifest href. |
 | `SetTitleAddOns(IEnumerable<string>)` | Appends title tokens within the 64-character limit. |
+| `AddHeadLink(CloudHeadLink)` | Adds an icon, preload, preconnect, or other reusable head link. |
+| `AddHeadLinks(params CloudHeadLink[])` | Adds several head links in render order. |
+| `Reset()` | Clears route metadata while retaining request safety settings. Interactive navigation calls it automatically. |
+
+### Icons and performance links
+
+`SetFavicon()` remains the concise single-icon API. Use `CloudHeadLink` when a site needs the
+complete icon set expected by browsers and search results, or when a critical resource should
+be discovered early:
+
+```csharp
+config.PageDefaults.AddHeadLinks(
+    CloudHeadLink.Icon("/favicon.svg"),
+    CloudHeadLink.Icon("/favicon-96x96.png", sizes: "96x96"),
+    CloudHeadLink.AppleTouchIcon("/apple-touch-icon.png", "180x180"),
+    CloudHeadLink.FontPreload("/fonts/site.woff2"));
+```
+
+The descriptor and its `CloudHeadLinks` renderer live in the common `AngryMonkey.CloudBlazor`
+package, so the same API works in WebAssembly and hybrid hosts. For localized assets, use
+`CloudHeadLink.LocalizedFontPreload(...)`; it selects the full UI culture first, then the neutral
+language, without loading every language's font. MIME types are inferred from the resolved URL
+for icons, images, fonts, stylesheets, scripts, and manifests. Set `Type` only when an unusual
+extension or server response requires an explicit override.
+
+`CloudHeadContent` also clears page-specific title, canonical, robots, alternates, social data,
+JSON-LD, bundles, and head links before an interactive route renders. Consuming pages no longer
+need a custom cleanup helper to prevent metadata from the previous route leaking into the next.
 
 ### Title
 

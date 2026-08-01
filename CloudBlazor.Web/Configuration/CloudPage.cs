@@ -6,6 +6,8 @@ namespace AngryMonkey.CloudBlazor.Web;
 
 public partial class CloudPage
 {
+    private readonly bool _isNonProductionHost;
+
     public CloudPage() => IsCrawler = false;
 
     public CloudPage(IHttpContextAccessor accessor)
@@ -17,7 +19,9 @@ public partial class CloudPage
         IsCrawler = CloudWebConfig.IsCrawler(request?.Headers.UserAgent.ToString());
 
         // Preview and staging hosts must never be indexed.
-        if (CloudWebConfig.IsNonProductionHost(request?.Host.Host))
+        _isNonProductionHost = CloudWebConfig.IsNonProductionHost(request?.Host.Host);
+
+        if (_isNonProductionHost)
         {
             SetIndexPage(false);
             SetFollowPage(false);
@@ -58,7 +62,94 @@ public partial class CloudPage
     internal readonly List<CloudBundle> _bundles = [];
     public ReadOnlyCollection<CloudBundle> Bundles => _bundles.AsReadOnly();
 
+    internal readonly List<CloudHeadLink> _headLinks = [];
+
+    /// <summary>Icons, resource hints, and other reusable document-head links.</summary>
+    public ReadOnlyCollection<CloudHeadLink> HeadLinks => _headLinks.AsReadOnly();
+
     public event Action? OnModified;
+
+    /// <summary>
+    /// Clears route-specific state while retaining request-derived safety settings.
+    /// CloudBlazor.Web calls this automatically before interactive navigation renders
+    /// the next route, preventing metadata and JSON-LD from leaking between pages.
+    /// </summary>
+    public CloudPage Reset()
+    {
+        Title = null;
+        Keywords = null;
+        Description = null;
+        IndexPage = _isNonProductionHost ? false : null;
+        FollowPage = _isNonProductionHost ? false : null;
+        NoArchive = null;
+        MaxImagePreview = null;
+        MaxSnippet = null;
+        MaxVideoPreview = null;
+        Favicon = null;
+        ThemeColor = null;
+        Manifest = null;
+        AddLegacyExportsCreation = null;
+
+        Canonical = null;
+        OpenGraphType = null;
+        SiteName = null;
+        SocialTitle = null;
+        SocialDescription = null;
+        Image = null;
+        Locale = null;
+        TwitterCard = null;
+        TwitterSite = null;
+        TwitterCreator = null;
+
+        _titleAddOns.Clear();
+        _features.Clear();
+        _bundles.Clear();
+        _headLinks.Clear();
+        _alternates.Clear();
+        _localeAlternates.Clear();
+        _structuredData.Clear();
+
+        OnModified?.Invoke();
+
+        return this;
+    }
+
+    /// <summary>Adds an icon, preload, preconnect, or other link to the document head.</summary>
+    public CloudPage AddHeadLink(CloudHeadLink link)
+    {
+        ArgumentNullException.ThrowIfNull(link);
+
+        _headLinks.RemoveAll(existing =>
+            string.Equals(existing.Rel, link.Rel, StringComparison.OrdinalIgnoreCase) &&
+            string.Equals(existing.Href, link.Href, StringComparison.OrdinalIgnoreCase));
+
+        _headLinks.Add(link);
+        OnModified?.Invoke();
+
+        return this;
+    }
+
+    /// <summary>Adds document-head links in their render order.</summary>
+    public CloudPage AddHeadLinks(params CloudHeadLink[]? links)
+    {
+        if (links == null)
+            return this;
+
+        foreach (CloudHeadLink link in links)
+        {
+            ArgumentNullException.ThrowIfNull(link);
+
+            _headLinks.RemoveAll(existing =>
+                string.Equals(existing.Rel, link.Rel, StringComparison.OrdinalIgnoreCase) &&
+                string.Equals(existing.Href, link.Href, StringComparison.OrdinalIgnoreCase));
+
+            _headLinks.Add(link);
+        }
+
+        OnModified?.Invoke();
+
+        return this;
+    }
 
     public CloudPage InsertBundle(int index, CloudBundle bundle)
     {
@@ -327,5 +418,19 @@ public partial class CloudPage
 
     public string? KeywordsResult() => Keywords;
 
-    public string? DescriptionResult() => Description?.Length > 160 ? $"{Description[..157]}..." : Description;
+    public string? DescriptionResult()
+    {
+        if (Description == null || Description.Length <= 160)
+            return Description;
+
+        string result = Description[..157].TrimEnd();
+        int lastSpace = result.LastIndexOf(' ');
+
+        // Prefer a natural boundary, but keep useful snippet length when a single long
+        // token or URL occupies most of the description.
+        if (lastSpace >= 120)
+            result = result[..lastSpace].TrimEnd();
+
+        return $"{result}...";
+    }
 }
