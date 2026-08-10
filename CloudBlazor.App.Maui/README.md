@@ -9,7 +9,7 @@
 **.NET MAUI Blazor Hybrid integration for CloudBlazor.App: native navigation, hardware back
 button handling, and platform launcher support.**
 
-Formerly published as `AngryMonkey.CloudApp.Maui` and `AngryMonkey.CloudApp.Mobile`. See
+Formerly published as `AngryMonkey.CloudBlazor.App.Maui` and `AngryMonkey.CloudBlazor.App.Mobile`. See
 [Migrating](#migrating).
 
 ## Supported platforms
@@ -106,8 +106,8 @@ The string overload parses and delegates to the `Uri` overload, so only one need
 
 | Previous package | Last version | Replacement |
 |---|---|---|
-| `AngryMonkey.CloudApp.Maui` | 1.2.1 | `AngryMonkey.CloudBlazor.App.Maui` |
-| `AngryMonkey.CloudApp.Mobile` | 1.1.0 | `AngryMonkey.CloudBlazor.App.Maui` |
+| `AngryMonkey.CloudBlazor.App.Maui` | 1.2.1 | `AngryMonkey.CloudBlazor.App.Maui` |
+| `AngryMonkey.CloudBlazor.App.Mobile` | 1.1.0 | `AngryMonkey.CloudBlazor.App.Maui` |
 
 The previous packages are no longer updated. The repositories were merged into
 [CloudBlazor](https://github.com/angrymonkeycloud/CloudBlazor), where all four packages ship as
@@ -117,7 +117,7 @@ a matched set.
 
 | Before | After |
 |---|---|
-| `using AngryMonkey.CloudApp;` | `using AngryMonkey.CloudBlazor.App;` |
+| `using AngryMonkey.CloudBlazor.App;` | `using AngryMonkey.CloudBlazor.App;` |
 | Manual `services.AddScoped<INavigationService, MauiNavigationService>()` | `services.AddCloudAppMaui()` |
 
 `MauiNavigationService` keeps its name and members. Two behaviours changed as bug fixes:

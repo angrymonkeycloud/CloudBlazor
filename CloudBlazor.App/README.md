@@ -9,7 +9,7 @@
 **Application framework for Blazor WebAssembly and Blazor Hybrid clients: one navigation
 contract, page hierarchy tracking, and popup-aware back navigation.**
 
-Formerly published as `AngryMonkey.CloudApp`. See [Migrating](#migrating-from-angrymonkeycloudapp).
+Formerly published as `AngryMonkey.CloudBlazor.App`. See [Migrating](#migrating-from-angrymonkeycloudapp).
 
 ## Installation
 
@@ -138,15 +138,15 @@ Server, which has none.
 
 ---
 
-## Migrating from AngryMonkey.CloudApp
+## Migrating from AngryMonkey.CloudBlazor.App
 
 | Previous package | Last version | Replacement |
 |---|---|---|
-| `AngryMonkey.CloudApp` | 1.2.1 | `AngryMonkey.CloudBlazor.App` |
-| `AngryMonkey.CloudApp.Maui` | 1.2.1 | `AngryMonkey.CloudBlazor.App.Maui` |
-| `AngryMonkey.CloudApp.Shared` | 1.1.0 | `AngryMonkey.CloudBlazor.App` |
-| `AngryMonkey.CloudApp.Web` | 1.1.0 | `AngryMonkey.CloudBlazor.App` |
-| `AngryMonkey.CloudApp.Mobile` | 1.1.0 | `AngryMonkey.CloudBlazor.App.Maui` |
+| `AngryMonkey.CloudBlazor.App` | 1.2.1 | `AngryMonkey.CloudBlazor.App` |
+| `AngryMonkey.CloudBlazor.App.Maui` | 1.2.1 | `AngryMonkey.CloudBlazor.App.Maui` |
+| `AngryMonkey.CloudBlazor.App.Shared` | 1.1.0 | `AngryMonkey.CloudBlazor.App` |
+| `AngryMonkey.CloudBlazor.App.Web` | 1.1.0 | `AngryMonkey.CloudBlazor.App` |
+| `AngryMonkey.CloudBlazor.App.Mobile` | 1.1.0 | `AngryMonkey.CloudBlazor.App.Maui` |
 
 The previous packages are no longer updated. The repositories were merged into
 [CloudBlazor](https://github.com/angrymonkeycloud/CloudBlazor), where all four packages ship as
@@ -156,7 +156,7 @@ a matched set.
 
 | Before | After |
 |---|---|
-| `using AngryMonkey.CloudApp;` | `using AngryMonkey.CloudBlazor.App;` |
+| `using AngryMonkey.CloudBlazor.App;` | `using AngryMonkey.CloudBlazor.App;` |
 | Manual `services.AddScoped<INavigationService, WebNavigationService>()` | `services.AddCloudApp()` |
 | Manual `services.AddScoped<INavigationService, MauiNavigationService>()` | `services.AddCloudAppMaui()` |
 
