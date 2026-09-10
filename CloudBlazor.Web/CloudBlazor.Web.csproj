@@ -9,7 +9,7 @@
 		<Description>Server-side website infrastructure for Blazor and MVC applications: page head metadata, SEO and robots directives, asset bundles, and crawler detection.</Description>
 		<PackageTags>blazor;aspnetcore;mvc;seo;metadata;bundles;head;angrymonkey</PackageTags>
 
-		<Version>1.0.1</Version>
+		<Version>1.1.0</Version>
 		<AssemblyVersion>$(PackageVersion)</AssemblyVersion>
 		<FileVersion>$(PackageVersion)</FileVersion>
 

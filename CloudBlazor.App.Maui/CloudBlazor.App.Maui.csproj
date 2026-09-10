@@ -9,7 +9,7 @@
 		<Description>.NET MAUI Blazor Hybrid integration for CloudBlazor.App: native navigation, hardware back button handling, and external launcher support.</Description>
 		<PackageTags>blazor;maui;hybrid;blazorwebview;navigation;android;ios;angrymonkey</PackageTags>
 
-		<Version>1.0.1</Version>
+		<Version>1.1.0</Version>
 		<AssemblyVersion>$(PackageVersion)</AssemblyVersion>
 		<FileVersion>$(PackageVersion)</FileVersion>
 

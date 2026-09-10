@@ -9,7 +9,7 @@
 		<Description>Application framework for Blazor WebAssembly and Blazor Hybrid clients: navigation abstractions, page hierarchy tracking, and a browser navigation service.</Description>
 		<PackageTags>blazor;webassembly;navigation;spa;maui;angrymonkey</PackageTags>
 
-		<Version>1.0.1</Version>
+		<Version>1.1.0</Version>
 		<AssemblyVersion>$(PackageVersion)</AssemblyVersion>
 		<FileVersion>$(PackageVersion)</FileVersion>
 

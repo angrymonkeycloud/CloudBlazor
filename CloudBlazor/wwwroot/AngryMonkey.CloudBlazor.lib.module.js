@@ -1,10 +1,6 @@
-﻿import {
-    initializeCloudBlazor,
-    disableEnhancedNavigation
-} from "./scripts/cloud-blazor.js";
+﻿import { initializeCloudBlazor } from "./scripts/cloud-blazor.js";
 
 function initialize() {
-    disableEnhancedNavigation();
     initializeCloudBlazor();
 }
 

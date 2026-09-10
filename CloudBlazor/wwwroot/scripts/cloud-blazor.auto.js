@@ -1,4 +1,4 @@
-import { initializeCloudBlazor, disableEnhancedNavigation } from "./cloud-blazor.js";
+import { initializeCloudBlazor } from "./cloud-blazor.js";
 
 /**
  * Entry point for hosts that have no Blazor JS initializer pipeline, such as MVC,
@@ -8,7 +8,6 @@ import { initializeCloudBlazor, disableEnhancedNavigation } from "./cloud-blazor
  * hosts. Both paths are guarded, so loading both is harmless.
  */
 function initialize() {
-    disableEnhancedNavigation();
     initializeCloudBlazor();
 }
 

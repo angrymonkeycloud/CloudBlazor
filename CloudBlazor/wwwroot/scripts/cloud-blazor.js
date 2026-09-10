@@ -1,7 +1,4 @@
 const initializationKey = "__angryMonkeyCloudBlazorInitialized";
-const enhancedNavigationKey = "__angryMonkeyCloudBlazorEnhancedNavigationDisabled";
-
-const enhancedNavigationAttribute = "data-enhance-nav";
 
 const selectors = Object.freeze({ homeLink: "[cloud-home-link]" });
 
@@ -22,52 +19,6 @@ export function initializeCloudBlazor() {
     globalThis[initializationKey] = true;
 
     document.addEventListener("click", handleDocumentClick);
-}
-
-/**
- * Disables Blazor enhanced navigation for the entire application.
- *
- * Applying the attribute to the body makes all descendant links use normal
- * browser navigation unless a descendant explicitly overrides the setting.
- *
- * Two cases are handled explicitly:
- *
- * 1. The body may not exist yet. A JS initializer's `beforeStart` runs before the
- *    document has finished parsing when the Blazor script sits in `<head>`, so the
- *    attribute is applied again once the DOM is ready.
- * 2. Enhanced navigation patches the live DOM against freshly rendered server
- *    markup, which does not carry the attribute, so it is reapplied after every
- *    enhanced page load.
- */
-export function disableEnhancedNavigation() {
-
-    applyEnhancedNavigationAttribute();
-
-    if (!document.body)
-        document.addEventListener("DOMContentLoaded", applyEnhancedNavigationAttribute, { once: true });
-
-    // The Blazor global is not guaranteed to exist during `beforeStart`, so the
-    // subscription is retried on every call until it succeeds. Initializers run
-    // both before and after Blazor starts, which is enough to catch it.
-    if (globalThis[enhancedNavigationKey])
-        return;
-
-    if (typeof globalThis.Blazor?.addEventListener !== "function")
-        return;
-
-    globalThis[enhancedNavigationKey] = true;
-
-    globalThis.Blazor.addEventListener("enhancedload", applyEnhancedNavigationAttribute);
-}
-
-/**
- * Writes the opt-out attribute onto the body when it is not already set.
- */
-function applyEnhancedNavigationAttribute() {
-    const body = document.body;
-
-    if (body && body.getAttribute(enhancedNavigationAttribute) !== "false")
-        body.setAttribute(enhancedNavigationAttribute, "false");
 }
 
 /**

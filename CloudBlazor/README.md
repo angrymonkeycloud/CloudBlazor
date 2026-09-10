@@ -104,12 +104,16 @@ clicks, downloads, external targets and non-HTTP protocols are always left to th
 | `cloud-scroll-behavior` | `smooth` | `smooth`, `auto`, or `instant`. |
 | `cloud-behavior-disabled` | — | Opts a single anchor out. |
 
-### Enhanced navigation opt-out
+### Enhanced navigation
 
-CloudBlazor sets `data-enhance-nav="false"` on `<body>`, so links perform ordinary browser
-navigation instead of Blazor enhanced navigation. The attribute is reapplied after every
-enhanced page load, because enhanced navigation patches the live DOM against server markup that
-does not carry it.
+CloudBlazor leaves Blazor enhanced navigation alone. An application that wants ordinary browser
+navigation sets `data-enhance-nav="false"` on its own `<body>` in `App.razor`; the server renders
+that attribute on every response, so it survives enhanced navigation without any help.
+
+Earlier versions applied the attribute themselves, from the JS initializer, for every application
+that referenced the package. That turned every link into a full document load, which on an
+application with interactive WebAssembly pages tears the .NET runtime down and boots it again on
+each navigation. Referencing CloudBlazor no longer changes how an application navigates.
 
 ---
 

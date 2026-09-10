@@ -42,9 +42,9 @@
 
     <div class="callout">
         <p>
-            <code>data-enhance-nav="false"</code> on <code>&lt;body&gt;</code> is applied by
-            CloudBlazor. It opts the application out of Blazor enhanced navigation, so links
-            perform ordinary browser navigation.
+            <code>data-enhance-nav</code> is not set by CloudBlazor, so this reads
+            <code>(not set)</code> unless the application sets it. An application that wants
+            ordinary browser navigation puts the attribute on its own <code>&lt;body&gt;</code>.
         </p>
     </div>
 </section>
