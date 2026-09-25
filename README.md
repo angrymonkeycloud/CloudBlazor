@@ -273,3 +273,7 @@ MIT License © Angry Monkey Cloud
 ## Angry Monkey Cloud
 
 This project follows the shared [AI development instructions](https://github.com/angrymonkeycloud/CloudDocs/blob/main/docs/ai/instructions.md).
+
+## Theme integration
+
+CloudBlazor hosting remains independent of theme models. Its demo uses CloudThemeDocument from CloudCommon.Theming.Blazor; the existing mode switch also updates data-amc-theme. See [the common theme contract](../CloudCommon/docs/theming.md).
