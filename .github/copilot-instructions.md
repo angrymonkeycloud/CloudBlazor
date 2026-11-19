@@ -12,7 +12,7 @@ standards that apply to this repository, see:
 ## What this repo is
 
 `CloudBlazor` is the foundation of the Angry Monkey Cloud Blazor ecosystem. It publishes four
-NuGet packages from one repository, targeting .NET 10:
+NuGet packages from one repository, targeting .NET 11:
 
 | Project | Package | Role |
 |---|---|---|
